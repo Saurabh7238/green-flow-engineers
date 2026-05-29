@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "siteName": "Green Flow Engineers",
+    "tagline": "Innovative Solutions for a Sustainable Future",
+    "description": "Green Flow Engineers delivers water treatment, HVAC, textile machinery, fire safety, and sustainable industrial engineering solutions across India."
+  },
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "gallery": "Gallery",
+    "blog": "Blog",
+    "about": "About Us",
+    "contact": "Contact",
+    "language": "Language"
+  },
+  "cta": {
+    "contact": "Contact Us",
+    "blog": "Read Blog",
+    "services": "Our Services",
+    "getQuote": "Get a Quote",
+    "learnMore": "Learn More",
+    "viewAllServices": "View All Services",
+    "readArticle": "Read Article",
+    "print": "Print / Export",
+    "backToBlog": "Back to Blog",
+    "viewGallery": "View Gallery"
+  },
+  "gallery": {
+    "title": "Project & Machinery Gallery",
+    "subtitle": "Photos from our completed installations and equipment supplied across industrial sites.",
+    "projects": "Completed Projects",
+    "machinery": "Machinery & Equipment",
+    "all": "All Photos",
+    "featuredTitle": "Our Work in Pictures",
+    "featuredSubtitle": "Completed projects and machinery from Green Flow Engineers sites.",
+    "viewGallery": "View Full Gallery",
+    "replaceNote": "Replace demo photos with your own images — see public/images/gallery/README.md"
+  },
+  "home": {
+    "heroTitle": "Engineering a Greener Tomorrow",
+    "heroSubtitle": "Green Flow Engineers partners with industries to design, supply, install, and commission sustainable water, HVAC, textile, fire safety, and lighting systems.",
+    "introTitle": "Trusted Industrial Engineering Partner",
+    "introText": "From WTP/STP/ETP plants to textile machinery commissioning, we combine technical expertise with a commitment to environmental responsibility. Based in Kanpur, we serve clients across Uttar Pradesh and India with reliable, energy-efficient solutions.",
+    "servicesOverview": "What We Deliver",
+    "whyUsTitle": "Why Green Flow Engineers?",
+    "whyUs": {
+      "experience": "End-to-end supply, installation & commissioning",
+      "sustainability": "Eco-conscious designs for long-term savings",
+      "support": "Responsive maintenance and after-sales support",
+      "compliance": "Industry-standard safety and quality practices"
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Comprehensive industrial engineering solutions tailored to your facility.",
+    "brochureNote": "Use Print / Export to save this page as a service brochure.",
+    "items": {
+      "water": {
+        "title": "WTP / STP / ETP & Industrial RO Systems",
+        "description": "Design, supply, installation, and commissioning of water treatment and reverse osmosis plants for industrial and commercial applications."
+      },
+      "racks": {
+        "title": "Industrial Heavy Duty Storage Racks",
+        "description": "Robust racking systems engineered for warehouses and production floors — supply and professional installation included."
+      },
+      "hvac": {
+        "title": "Humidification Plants / AHU / HVAC Systems",
+        "description": "Complete humidification, air handling, and HVAC solutions with supply, erection, and commissioning for optimal climate control."
+      },
+      "textile": {
+        "title": "Textile Machinery",
+        "description": "Installation and commissioning of spinning, weaving, and processing units for modern textile manufacturing lines."
+      },
+      "fire": {
+        "title": "Fire Fighting Systems",
+        "description": "Fire detection, suppression, and safety systems — supply, installation, and ongoing maintenance for regulatory compliance."
+      },
+      "lighting": {
+        "title": "Industrial & Commercial Lighting",
+        "description": "Energy-efficient LED and industrial lighting design with complete supply and installation for factories and commercial spaces."
+      }
+    }
+  },
+  "blog": {
+    "title": "Industry Insights",
+    "subtitle": "Expert articles on water treatment, HVAC, textiles, fire safety, and sustainable lighting.",
+    "searchPlaceholder": "Search articles by title, topic, or tag…",
+    "categories": "Categories",
+    "tags": "Tags",
+    "allPosts": "All Posts",
+    "noResults": "No articles match your search.",
+    "readTime": "min read",
+    "relatedPosts": "Related Articles"
+  },
+  "about": {
+    "title": "About Green Flow Engineers",
+    "visionTitle": "Our Vision",
+    "vision": "To be India's most trusted partner for sustainable industrial engineering — enabling businesses to grow responsibly while protecting natural resources.",
+    "missionTitle": "Our Mission",
+    "mission": "We deliver reliable, energy-efficient engineering solutions through expert installation, commissioning, and lifecycle support — helping clients achieve operational excellence with minimal environmental impact.",
+    "sustainabilityTitle": "Sustainability Focus",
+    "sustainability": "Every project we undertake prioritizes water conservation, energy efficiency, and safe working environments. From RO plants that reduce wastewater to LED retrofits that cut power consumption, sustainability is built into our engineering DNA.",
+    "directorTitle": "Leadership",
+    "directorName": "Mahesh Yadav",
+    "directorRole": "Director",
+    "directorBio": "Mahesh Yadav leads Green Flow Engineers with decades of hands-on experience in industrial plant installation, water treatment, and HVAC systems. His vision drives our commitment to quality workmanship and long-term client partnerships."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Tell us about your project — we'll respond promptly with technical guidance and a quotation.",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "service": "Service of Interest",
+      "message": "Project Details",
+      "submit": "Send Inquiry",
+      "success": "Thank you! Your inquiry has been received. We will contact you shortly.",
+      "selectService": "Select a service…"
+    }
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact"
+  },
+  "categories": {
+    "water-treatment": "Water Treatment",
+    "hvac": "HVAC & Humidification",
+    "textile": "Textile Machinery",
+    "fire-safety": "Fire Safety",
+    "lighting": "Sustainable Lighting"
+  }
+}
