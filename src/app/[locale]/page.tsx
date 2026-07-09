@@ -3,8 +3,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { GalleryPreview } from "@/components/GalleryPreview";
 import { ServiceCard } from "@/components/ServiceCard";
+import { HomeSlider } from "@/components/HomeSlider";
 import { serviceKeys } from "@/data/services";
 import { blogPosts } from "@/data/blog";
+import { getSiteContent } from "@/lib/site-content";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -27,50 +29,13 @@ export default async function HomePage({ params }: Props) {
   const tNav = await getTranslations("nav");
   const tCat = await getTranslations("categories");
   const loc = locale as "en" | "hi";
+  const dbContent = await getSiteContent();
 
   const featuredPosts = blogPosts.slice(0, 3);
 
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-600 to-sky-700 text-white">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_30%_20%,white,transparent_50%)]" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
-          <p className="text-sm font-semibold uppercase tracking-widest text-emerald-100">
-            {tMeta("tagline")}
-          </p>
-          <h1 className="mt-4 max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
-            {t("heroTitle")}
-          </h1>
-          <p className="mt-6 max-w-xl text-lg text-emerald-50">{t("heroSubtitle")}</p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Link
-              href={`/${locale}/contact`}
-              className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-emerald-800 shadow-lg transition hover:bg-emerald-50"
-            >
-              {tCta("contact")}
-            </Link>
-            <Link
-              href={`/${locale}/blog`}
-              className="rounded-lg border-2 border-white/80 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-            >
-              {tCta("blog")}
-            </Link>
-            <Link
-              href={`/${locale}/services`}
-              className="rounded-lg border-2 border-white/80 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-            >
-              {tCta("services")}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="max-w-3xl">
-          <h2 className="text-2xl font-bold text-slate-900">{t("introTitle")}</h2>
-          <p className="mt-4 text-slate-600 leading-relaxed">{t("introText")}</p>
-        </div>
-      </section>
+      <HomeSlider />
 
       <section className="bg-slate-100/80 py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">

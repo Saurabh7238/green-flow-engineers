@@ -1,0 +1,59 @@
+import { MongoClient } from "mongodb";
+
+const uri = process.env.MONGODB_URI || "mongodb+srv://s26719247_db_user:NvkQPt5xexENtgxm@cluster0.5lknnny.mongodb.net/";
+
+const options = {};
+
+let client: MongoClient | undefined;
+let clientPromise: Promise<MongoClient>;
+
+if (!globalThis.__mongoClientPromise) {
+  client = new MongoClient(uri, options);
+  // Create a connect promise that may attempt an optional insecure TLS fallback
+  // if the initial connection fails and the environment allows it.
+  // eslint-disable-next-line no-console
+  globalThis.__mongoClientPromise = (async () => {
+    try {
+      return await client!.connect();
+    } catch (err) {
+      console.error("MongoDB initial connect error:", err);
+
+      const allowInsecure = String(process.env.MONGODB_ALLOW_INSECURE_TLS || "").toLowerCase() === "true";
+      if (allowInsecure) {
+        console.warn("MONGODB_ALLOW_INSECURE_TLS=true — attempting insecure TLS connection (dev only)");
+        const insecureClient = new MongoClient(uri, { ...options, tlsAllowInvalidCertificates: true, tlsAllowInvalidHostnames: true });
+        return insecureClient.connect();
+      }
+
+      throw err;
+    }
+  })();
+}
+
+clientPromise = globalThis.__mongoClientPromise as Promise<MongoClient>;
+
+export async function getMongoClient() {
+  return clientPromise;
+}
+
+export async function getDb() {
+  const client = await getMongoClient();
+  return client.db("greenflow");
+}
+
+export async function testDbConnection() {
+  try {
+    const client = await getMongoClient();
+    await client.db("greenflow").command({ ping: 1 });
+    return true;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("DB ping failed:", err);
+    return false;
+  }
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __mongoClientPromise: Promise<MongoClient> | undefined;
+}

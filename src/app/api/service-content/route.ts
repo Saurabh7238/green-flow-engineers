@@ -7,12 +7,13 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const serviceKey = url.searchParams.get("serviceKey");
     const locale = url.searchParams.get("locale") || "en";
+    const variant = url.searchParams.get("variant") || undefined;
 
     if (!serviceKey || !serviceKeys.includes(serviceKey as ServiceKey)) {
       return NextResponse.json({ error: "Invalid serviceKey" }, { status: 400 });
     }
 
-    const content = await getServiceContent(serviceKey as ServiceKey, locale);
+    const content = await getServiceContent(serviceKey as ServiceKey, locale, variant);
     return NextResponse.json({ success: true, data: content ?? null });
   } catch (error) {
     console.error(error);
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { serviceKey, locale, title, description, imageUrl, sections } = body;
+    const { serviceKey, locale, variant, title, description, imageUrl, sections } = body;
 
     if (!serviceKey || !serviceKeys.includes(serviceKey as ServiceKey)) {
       return NextResponse.json({ error: "Invalid serviceKey" }, { status: 400 });
@@ -32,6 +33,7 @@ export async function POST(request: Request) {
     await upsertServiceContent({
       serviceKey: serviceKey as ServiceKey,
       locale: locale || "en",
+      variant: variant || undefined,
       title: title || "",
       description: description || "",
       imageUrl: imageUrl || "",
@@ -50,12 +52,13 @@ export async function DELETE(request: Request) {
     const url = new URL(request.url);
     const serviceKey = url.searchParams.get("serviceKey");
     const locale = url.searchParams.get("locale") || "en";
+    const variant = url.searchParams.get("variant") || undefined;
 
     if (!serviceKey || !serviceKeys.includes(serviceKey as ServiceKey)) {
       return NextResponse.json({ error: "Invalid serviceKey" }, { status: 400 });
     }
 
-    await deleteServiceContent(serviceKey as ServiceKey, locale);
+    await deleteServiceContent(serviceKey as ServiceKey, locale, variant);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);

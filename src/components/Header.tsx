@@ -297,13 +297,23 @@ export function Header() {
               </Link>
             </>
           ) : (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Logout
-            </button>
+            <>
+              {currentUser.role === "admin" ? (
+                <Link
+                  href="/admin"
+                  className="rounded-lg border border-slate-300 bg-slate-900 px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                >
+                  Admin
+                </Link>
+              ) : null}
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Logout
+              </button>
+            </>
           )}
           <Link
             href={`/${locale}/contact`}
@@ -388,7 +398,7 @@ export function Header() {
                 <p className="text-sm text-slate-700">Signed in as {currentUser.username}</p>
                 {currentUser.role === "admin" ? (
                   <Link
-                    href={`/${locale}/admin`}
+                    href="/admin"
                     onClick={() => setOpen(false)}
                     className="inline-flex rounded-lg bg-brand-green px-3 py-2 text-sm font-semibold text-white"
                   >

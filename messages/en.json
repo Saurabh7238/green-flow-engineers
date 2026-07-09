@@ -54,6 +54,26 @@
     "title": "Our Services",
     "subtitle": "Comprehensive industrial engineering solutions tailored to your facility.",
     "brochureNote": "Use Print / Export to save this page as a service brochure.",
+    "completedProjects": "Completed Projects",
+    "upcomingProjects": "Upcoming Projects",
+    "waterPlants": {
+      "water-treatment-plant": {
+        "title": "Water Treatment Plant",
+        "description": ""
+      },
+      "sewage-treatment-plant": {
+        "title": "Sewage Treatment Plant",
+        "description": "Efficient sewage treatment systems designed for safe discharge and reuse in urban and industrial facilities."
+      },
+      "effluent-treatment-plant": {
+        "title": "Effluent Treatment Plant",
+        "description": "Advanced effluent treatment solutions for compliance, recycling, and responsible wastewater management."
+      },
+      "industrial-ro-system": {
+        "title": "Industrial RO System",
+        "description": "High-performance reverse osmosis plants for ultrapure water and process water requirements."
+      }
+    },
     "items": {
       "water": {
         "title": "WTP / STP / ETP & Industrial RO Systems",
@@ -61,7 +81,26 @@
       },
       "racks": {
         "title": "Industrial Heavy Duty Storage Racks",
-        "description": "Robust racking systems engineered for warehouses and production floors — supply and professional installation included."
+        "description": "Robust racking systems engineered for warehouses and production floors — supply and professional installation included.",
+        "rackTypesHeading": "Storage rack solutions we offer",
+        "rackTypes": [
+          "Slotted Angle Rack",
+          "Multi-Tier Racking System",
+          "Display Rack",
+          "Supermarket Rack",
+          "FIFO Flow Rack (Gravity Flow Rack)",
+          "Two Tier Racking System",
+          "Modular Storage Rack",
+          "Warehouse Storage Rack",
+          "Heavy Duty Rack",
+          "Medium Duty Rack",
+          "Long Span Rack",
+          "Pallet Rack",
+          "Cantilever Rack",
+          "Mezzanine Floor",
+          "Mobile Compacter",
+          "Storage System"
+        ]
       },
       "hvac": {
         "title": "Humidification Plants / AHU / HVAC Systems",
@@ -69,7 +108,12 @@
       },
       "textile": {
         "title": "Textile Machinery",
-        "description": "Installation and commissioning of spinning, weaving, and processing units for modern textile manufacturing lines."
+        "description": "Installation and commissioning of spinning, weaving, and processing units for modern textile manufacturing lines.",
+        "machineryTypesHeading": "Textile machinery we support",
+        "machineryTypes": [
+          "Spinning",
+          "Weaving"
+        ]
       },
       "fire": {
         "title": "Fire Fighting Systems",

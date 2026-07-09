@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/PageHeader";
 import { ContactForm } from "@/components/ContactForm";
 import { siteConfig } from "@/lib/site";
+import { getSiteContent } from "@/lib/site-content";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -16,8 +17,9 @@ export default async function ContactPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("contact");
+  const dbContent = await getSiteContent();
   const address =
-    locale === "hi" ? siteConfig.address.hi : siteConfig.address.en;
+    dbContent.contactAddress || (locale === "hi" ? siteConfig.address.hi : siteConfig.address.en);
 
   return (
     <>
@@ -30,7 +32,7 @@ export default async function ContactPage({ params }: Props) {
               href={siteConfig.phoneHref}
               className="mt-2 block text-lg font-semibold text-brand-green-dark hover:underline"
             >
-              {siteConfig.phone}
+              {dbContent.phone || siteConfig.phone}
             </a>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -39,7 +41,7 @@ export default async function ContactPage({ params }: Props) {
               href={siteConfig.emailHref}
               className="mt-2 block text-lg font-semibold text-brand-blue hover:underline"
             >
-              {siteConfig.email}
+              {dbContent.email || siteConfig.email}
             </a>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
