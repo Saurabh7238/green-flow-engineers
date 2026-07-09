@@ -44,7 +44,7 @@ const slugify = (v: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const VARIANT_MAP: Record<ServiceKey, Record<string, string>> = {
+const VARIANT_MAP: Partial<Record<ServiceKey, Record<string, string>>> = {
   water: {
     "Water Treatment Plant (WTP)": "water-treatment-plant",
     "Sewage Treatment Plant (STP)": "sewage-treatment-plant",

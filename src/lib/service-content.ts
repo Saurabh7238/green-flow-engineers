@@ -6,6 +6,7 @@ export type ServiceSectionItem = {
   title: string;
   description: string;
   imageUrl: string;
+  alt?: string;
 };
 
 export type ServiceSection = {
