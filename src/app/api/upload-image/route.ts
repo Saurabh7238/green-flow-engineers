@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { GridFSBucket, ObjectId } from "mongodb";
+import { getDb } from "@/lib/mongodb";
 
 const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const maxSizeBytes = 3 * 1024 * 1024;
@@ -18,22 +18,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
     }
 
-    const fileSize = file.size || (await file.arrayBuffer()).byteLength;
-    if (fileSize > maxSizeBytes) {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    if (buffer.byteLength > maxSizeBytes) {
       return NextResponse.json({ error: "Image must be smaller than 3 MB" }, { status: 400 });
     }
 
-    const extension = path.extname(file.name) || ".jpg";
-    const fileName = `${Date.now()}-${Math.random().toString(16).slice(2)}${extension}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "service-images");
-    const filePath = path.join(uploadDir, fileName);
+    const db = await getDb();
+    const bucket = new GridFSBucket(db, { bucketName: "uploads" });
+    const uploadStream = bucket.openUploadStream(file.name, {
+      metadata: { contentType: file.type },
+    });
 
-    await fs.mkdir(uploadDir, { recursive: true });
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(filePath, buffer);
+    uploadStream.end(buffer);
 
-    const publicUrl = `/uploads/service-images/${fileName}`;
-    return NextResponse.json({ success: true, url: publicUrl });
+    await new Promise((resolve, reject) => {
+      uploadStream.on("finish", resolve);
+      uploadStream.on("error", reject);
+    });
+
+    const fileId = uploadStream.id as ObjectId;
+    const publicUrl = `/api/image/${fileId.toString()}`;
+
+    return NextResponse.json({ success: true, url: publicUrl, id: fileId.toString() });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to upload image" }, { status: 500 });
@@ -44,35 +50,16 @@ export async function DELETE(request: Request) {
   try {
     const url = new URL(request.url);
     const fileUrl = url.searchParams.get("url");
+    const idParam = url.searchParams.get("id");
+    const targetId = idParam || (fileUrl?.startsWith("/api/image/") ? fileUrl.slice("/api/image/".length) : undefined);
 
-    if (!fileUrl) {
-      return NextResponse.json({ error: "No image URL provided" }, { status: 400 });
+    if (!targetId || !ObjectId.isValid(targetId)) {
+      return NextResponse.json({ error: "No valid image ID provided" }, { status: 400 });
     }
 
-    const uploadsPrefix = "/uploads/service-images/";
-    if (!fileUrl.startsWith(uploadsPrefix)) {
-      return NextResponse.json({ error: "Invalid image URL" }, { status: 400 });
-    }
-
-    const fileName = decodeURIComponent(fileUrl.slice(uploadsPrefix.length));
-    if (!fileName || fileName.includes("..") || fileName.includes("/")) {
-      return NextResponse.json({ error: "Invalid file name" }, { status: 400 });
-    }
-
-    const filePath = path.join(process.cwd(), "public", "uploads", "service-images", fileName);
-
-    // If the file does not exist, treat delete as successful (idempotent)
-    const exists = await fs
-      .stat(filePath)
-      .then(() => true)
-      .catch(() => false);
-
-    if (!exists) {
-      console.warn(`upload-image: file not found for deletion: ${filePath}`);
-      return NextResponse.json({ success: true });
-    }
-
-    await fs.unlink(filePath);
+    const db = await getDb();
+    const bucket = new GridFSBucket(db, { bucketName: "uploads" });
+    await bucket.delete(new ObjectId(targetId));
 
     return NextResponse.json({ success: true });
   } catch (error) {
