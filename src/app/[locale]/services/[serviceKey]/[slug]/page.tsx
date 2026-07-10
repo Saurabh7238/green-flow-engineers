@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { PrintButton } from "@/components/PrintButton";
 import { serviceKeys, type ServiceKey } from "@/data/services";
-import { getServiceContent } from "@/lib/service-content";
+import { getServiceContent, getSlotVariant } from "@/lib/service-content";
 
 type Props = {
   params: Promise<{ locale: string; serviceKey: string; slug: string }>;
@@ -78,6 +78,8 @@ export default async function ServiceSlugPage({ params }: Props) {
   }
 
   const servicesT = await getTranslations({ locale, namespace: "services" });
+  const activeVariant = getSlotVariant(serviceKey as ServiceKey, slug);
+  const serviceContent = await getServiceContent(serviceKey as ServiceKey, locale, activeVariant);
 
   if (serviceKey === "water") {
     if (!waterPlantOptions.includes(slug as (typeof waterPlantOptions)[number])) {
@@ -85,7 +87,23 @@ export default async function ServiceSlugPage({ params }: Props) {
     }
 
     const t = await getTranslations({ locale, namespace: `services.waterPlants.${slug}` });
-    const serviceContent = await getServiceContent("water", locale, slug);
+    const waterSections = serviceContent?.sections?.length
+      ? serviceContent.sections
+      : serviceContent?.items?.length
+      ? [
+          {
+            id: slugify(slug),
+            label: serviceContent.title || t("title"),
+            items: serviceContent.items.map((item) => ({
+              id: item.id,
+              title: item.title,
+              description: item.description_short,
+              imageUrl: item.media_url || "",
+              alt: item.title,
+            })),
+          },
+        ]
+      : [];
 
     return (
       <>
@@ -109,9 +127,9 @@ export default async function ServiceSlugPage({ params }: Props) {
             <p className="mt-4 text-base leading-relaxed text-slate-700">{serviceContent?.description || t("description")}</p>
           </div>
 
-          {serviceContent?.sections?.length ? (
+          {waterSections.length ? (
             <div className="space-y-6">
-              {serviceContent.sections.map((section) => (
+              {waterSections.map((section) => (
                 <div key={section.id} className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
                   <h2 className="text-2xl font-semibold text-slate-900">{section.label}</h2>
                   <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -137,16 +155,29 @@ export default async function ServiceSlugPage({ params }: Props) {
   }
 
   if (serviceKey === "racks") {
-    const serviceContent = await getServiceContent("racks", locale);
-    const item =
-      serviceContent?.sections
-        ?.flatMap((section) => section.items)
-        .find((entry) => slugify(entry.title) === slug) ??
-      fallbackRackItems.find((entry) => slugify(entry.title) === slug);
+    const sectionItem = serviceContent?.sections
+      ?.flatMap((section) => section.items)
+      .find((entry) => slugify(entry.title) === slug);
+    const plainItem = serviceContent?.items?.find((entry) => slugify(entry.title) === slug);
+    const rawItem = sectionItem || plainItem || fallbackRackItems.find((entry) => slugify(entry.title) === slug);
 
-    if (!item) {
+    if (!rawItem) {
       notFound();
     }
+
+    const item = {
+      title: rawItem.title,
+      description:
+        "description" in rawItem
+          ? rawItem.description
+          : rawItem.description_short || "Detailed information for this storage solution will appear here once added from the admin panel.",
+      imageUrl:
+        "imageUrl" in rawItem
+          ? rawItem.imageUrl || ""
+          : "media_url" in rawItem
+            ? rawItem.media_url || ""
+            : "",
+    };
 
     return (
       <>
@@ -170,6 +201,34 @@ export default async function ServiceSlugPage({ params }: Props) {
             <p className="mt-4 text-base leading-relaxed text-slate-700">
               {item.description || "Detailed information for this storage solution will appear here once added from the admin panel."}
             </p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (serviceContent) {
+    const genericTitle = serviceContent.title || servicesT("title");
+    return (
+      <>
+        <PageHeader title={genericTitle} subtitle={servicesT("subtitle")}>
+          <PrintButton />
+        </PageHeader>
+        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+          <Link href={`/${locale}/services/${serviceKey}`} className="mb-8 inline-flex items-center text-sm font-semibold text-brand-green hover:underline">
+            ← {servicesT("title")}
+          </Link>
+
+          <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+            {serviceContent.imageUrl ? (
+              <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
+                <div className="overflow-hidden rounded-[1.25rem] border border-slate-200 bg-slate-100">
+                  <img src={serviceContent.imageUrl} alt={genericTitle} className="h-80 w-full object-cover" />
+                </div>
+              </div>
+            ) : null}
+            <h1 className="mt-6 text-3xl font-semibold text-slate-900">{genericTitle}</h1>
+            <p className="mt-4 text-base leading-relaxed text-slate-700">{serviceContent.description || servicesT("subtitle")}</p>
           </div>
         </div>
       </>

@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { PrintButton } from "@/components/PrintButton";
 import { serviceKeys, type ServiceKey } from "@/data/services";
-import { getServiceContent, getAllServiceContent } from "@/lib/service-content";
+import { getServiceContent, getAllServiceContent, getSlotVariant } from "@/lib/service-content";
 
 type Props = {
   params: Promise<{ locale: string; serviceKey: string }>;
@@ -75,16 +75,52 @@ export default async function ServiceDetailPage({ params }: Props) {
   const isTextileService = serviceKey === "textile";
   const rackTypes = (isRackService ? (t.raw("rackTypes") as string[] | undefined) : undefined) ?? [];
   const textileMachineryTypes = (isTextileService ? (t.raw("machineryTypes") as string[] | undefined) : undefined) ?? [];
-  const serviceContent =
+  const allServiceContents = await getAllServiceContent(locale);
+  const normalizedServiceContents = allServiceContents.filter(
+    (content): content is NonNullable<(typeof allServiceContents)[number]> => content !== null,
+  );
+  const serviceGroupContents = normalizedServiceContents.filter((content) => content.serviceKey === serviceKey);
+  const heroContent =
     serviceKey === "textile"
       ? null
-      : await getServiceContent(serviceKey as ServiceKey, locale);
-  const allServiceContents = serviceKey === "textile" ? await getAllServiceContent(locale) : [];
-  const textileContents = allServiceContents.filter((content) => content.serviceKey === "textile");
+      : (serviceGroupContents.find((content) => content.imageUrl || content.items?.some((item) => item.media_url)) ?? serviceGroupContents[0] ?? null);
+  const serviceContent = serviceKey === "textile" ? null : heroContent;
+  const textileContents = normalizedServiceContents.filter((content) => content.serviceKey === "textile");
   const rackItems =
     serviceContent?.sections?.flatMap((section) => section.items).length
       ? serviceContent?.sections?.flatMap((section) => section.items) ?? []
       : fallbackRackItems;
+
+  const contentSections = (() => {
+    if (!serviceGroupContents.length) return [];
+
+    const sectionMap = new Map<string, any[]>();
+
+    serviceGroupContents.forEach((content) => {
+      const contentVariant = content.variant || "";
+      const contentGroupLabel = contentVariant || content.title || "Uncategorized";
+      if (content.sections?.length) {
+        content.sections.forEach((section) => {
+          const label = section.label || contentGroupLabel;
+          const existing = sectionMap.get(label) || [];
+          sectionMap.set(label, existing.concat(section.items));
+        });
+      } else if (content.items?.length) {
+        content.items.forEach((item) => {
+          const label = item.subtype || contentGroupLabel;
+          const existing = sectionMap.get(label) || [];
+          existing.push(item);
+          sectionMap.set(label, existing);
+        });
+      }
+    });
+
+    return Array.from(sectionMap.entries()).map(([label, items]) => ({
+      id: slugify(label),
+      label,
+      items,
+    }));
+  })();
 
   return (
     <>
@@ -121,10 +157,14 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
         ) : (
           <div className="space-y-8">
-            {serviceContent?.imageUrl ? (
+            {serviceContent?.imageUrl || serviceContent?.items?.find((item) => item.media_url)?.media_url ? (
               <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
                 <div className="overflow-hidden rounded-[1.25rem] border border-slate-200 bg-slate-100">
-                  <img src={serviceContent.imageUrl} alt={serviceContent.title || t("title")} className="h-64 w-full object-cover" />
+                  <img
+                    src={serviceContent.imageUrl || serviceContent.items?.find((item) => item.media_url)?.media_url || ""}
+                    alt={serviceContent.title || t("title")}
+                    className="h-64 w-full object-cover"
+                  />
                 </div>
               </div>
             ) : null}
@@ -141,21 +181,36 @@ export default async function ServiceDetailPage({ params }: Props) {
               </p>
             </div>
 
-            {serviceContent?.sections?.length ? (
+            {contentSections.length ? (
               <div className="space-y-6">
-                {serviceContent.sections.map((section) => (
+                {contentSections.map((section) => (
                   <div key={section.id} className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
                     <h3 className="text-xl font-semibold text-slate-900">{section.label}</h3>
                     <div className="mt-6 grid gap-4 sm:grid-cols-2">
                       {section.items.map((item) => (
                         <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                          {item.imageUrl ? (
+                          {'media_type' in item && item.media_type === 'video' ? (
+                            <video
+                              src={item.media_url}
+                              className="mb-4 h-48 w-full object-cover"
+                              autoPlay
+                              muted
+                              loop
+                              playsInline
+                            />
+                          ) : item.imageUrl || item.media_url ? (
                             <div className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                              <img src={item.imageUrl} alt={item.title} className="h-48 w-full object-cover" />
+                              <img
+                                src={item.imageUrl ?? item.media_url}
+                                alt={item.title}
+                                className="h-48 w-full object-cover"
+                              />
                             </div>
                           ) : null}
                           <h4 className="text-sm font-semibold text-slate-900">{item.title}</h4>
-                          <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                            {'description' in item ? item.description : item.description_short}
+                          </p>
                         </div>
                       ))}
                     </div>

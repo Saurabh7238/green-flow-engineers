@@ -3,10 +3,23 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { serviceKeys, type ServiceKey } from "@/data/services";
+import { getSlotVariant } from "@/lib/content-slot";
 
-type SectionItem = { id: string; title: string; description?: string; imageUrl?: string; subtype?: string };
+type ServiceContentItem = {
+  id: string;
+  vertical_tab: ServiceKey;
+  subtype: string;
+  title: string;
+  description_short: string;
+  description_detailed?: string;
+  media_type: "image" | "video";
+  media_url: string;
+  action_link: string;
+};
+
+type SectionItem = { id: string; title: string; description?: string; imageUrl?: string; alt?: string; subtype?: string };
 type Section = { id: string; label: string; items: SectionItem[] };
-type ServiceContent = { serviceKey: ServiceKey; locale: string; variant?: string; title: string; description: string; imageUrl?: string; sections: Section[] };
+type ServiceContent = { serviceKey: ServiceKey; locale: string; variant?: string; title: string; description: string; imageUrl?: string; items: ServiceContentItem[]; sections?: Section[] };
 type SliderItem = { id: string; sequence: number; mediaType: "image" | "video"; assetUrl: string; headline?: string; actionLink?: string; boundaryClass?: string; aspect?: string };
 
 const SUBTYPE_MAP: Record<string, string[]> = {
@@ -97,19 +110,25 @@ export default function AdminPage() {
   }, [authorized]);
 
   useEffect(() => {
+    if (!authorized) return;
+    void loadContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authorized, serviceKey, subtype, variant]);
+
+  useEffect(() => {
     const list = SUBTYPE_MAP[serviceKey];
     if (list && list.length) {
       setSubtype(list[0]);
-      const newVariant = resolveVariant(serviceKey, list[0]);
+      const newVariant = getSlotVariant(serviceKey, list[0]);
       if (newVariant) setVariant(newVariant);
     }
   }, [serviceKey]);
 
   useEffect(() => {
-    const maybeVariant = resolveVariant(serviceKey, subtype);
+    const maybeVariant = getSlotVariant(serviceKey, subtype);
     if (maybeVariant) {
       setVariant(maybeVariant);
-    } else if (serviceKey !== "water") {
+    } else {
       setVariant("");
     }
   }, [serviceKey, subtype]);
@@ -117,18 +136,28 @@ export default function AdminPage() {
   async function loadContent() {
     setLoading(true);
     try {
+      const activeVariant = getSlotVariant(serviceKey, subtype) || variant || undefined;
       const query = new URLSearchParams({ serviceKey, locale: "en" });
-      if (variant) query.set("variant", variant);
+      if (activeVariant) query.set("variant", activeVariant);
       const res = await fetch(`/api/service-content?${query.toString()}`);
       const data = await res.json();
       if (res.ok && data.success) {
-        setContent(data.data || { serviceKey, locale: "en", variant: variant || undefined, title: "", description: "", sections: [] });
+        setContent(
+          data.data || {
+            serviceKey,
+            locale: "en",
+            variant: activeVariant,
+            title: "",
+            description: "",
+            items: [],
+          },
+        );
       } else {
-        setContent({ serviceKey, locale: "en", variant: variant || undefined, title: "", description: "", sections: [] });
+        setContent({ serviceKey, locale: "en", variant: activeVariant, title: "", description: "", items: [] });
       }
     } catch (err) {
       console.error(err);
-      setContent({ serviceKey, locale: "en", variant: variant || undefined, title: "", description: "", sections: [] });
+      setContent({ serviceKey, locale: "en", variant: variant || undefined, title: "", description: "", items: [] });
     } finally {
       setLoading(false);
     }
@@ -231,7 +260,15 @@ export default function AdminPage() {
     }
   };
 
-  const handleAddItem = async (payload: { title: string; short: string; detailed?: string; imageFile?: File }) => {
+  const handleAddItem = async (payload: {
+    title: string;
+    short: string;
+    detailed?: string;
+    mediaType: "image" | "video";
+    mediaUrl: string;
+    actionLink: string;
+    imageFile?: File;
+  }) => {
     setStatus("");
     if (!validateSubtypeForService(serviceKey, subtype)) {
       setStatus("Chosen subtype is not valid for selected service.");
@@ -243,36 +280,49 @@ export default function AdminPage() {
       return false;
     }
 
-    let imageUrl = "";
-    if (payload.imageFile) {
+    if (payload.mediaType === "video" && !payload.mediaUrl.trim()) {
+      setStatus("Video URL is required for video media type.");
+      return false;
+    }
+
+    if (payload.mediaType === "image" && !payload.mediaUrl.trim() && !payload.imageFile) {
+      setStatus("Image file or image URL is required for image media type.");
+      return false;
+    }
+
+    let mediaUrl = payload.mediaUrl.trim();
+    if (payload.mediaType === "image" && payload.imageFile) {
       const up = await uploadImage(payload.imageFile);
       if (!up?.success) {
         setStatus("Image upload failed");
         return false;
       }
-      imageUrl = up.url;
+      mediaUrl = up.url;
     }
 
-    const newItem: SectionItem = {
+    const activeVariant = getSlotVariant(serviceKey, subtype) || variant || undefined;
+
+    const newItem: ServiceContentItem = {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      title: payload.title,
-      description: payload.short,
-      imageUrl: imageUrl,
+      vertical_tab: serviceKey,
       subtype,
+      title: payload.title.trim(),
+      description_short: payload.short.trim().slice(0, 160),
+      description_detailed: payload.detailed?.trim() || "",
+      media_type: payload.mediaType,
+      media_url: mediaUrl,
+      action_link: payload.actionLink.trim() || "#",
     };
 
-    const newContent: ServiceContent = JSON.parse(JSON.stringify(content || { serviceKey, locale: "en", title: "", description: "", sections: [] }));
+    const newContent: ServiceContent = JSON.parse(
+      JSON.stringify(content || { serviceKey, locale: "en", variant: activeVariant, title: "", description: "", items: [] }),
+    );
+    newContent.serviceKey = serviceKey;
+    newContent.locale = "en";
+    newContent.variant = activeVariant;
+    newContent.items = newContent.items || [];
+    newContent.items.push(newItem);
 
-    // find or create section for the subtype
-    const sectionId = `subtype-${slugify(subtype)}`;
-    let section = newContent.sections.find((s) => s.id === sectionId);
-    if (!section) {
-      section = { id: sectionId, label: subtype, items: [] };
-      newContent.sections.push(section);
-    }
-    section.items.push(newItem);
-
-    // persist
     setLoading(true);
     try {
       const res = await fetch(`/api/service-content`, {
@@ -285,7 +335,7 @@ export default function AdminPage() {
         return false;
       }
       setContent(newContent);
-      setStatus(`Item added and saved. Content will appear on the frontend under /en/services/${serviceKey}${variant ? `/${variant}` : ""}.`);
+      setStatus(`Item added and saved. Content will appear on the frontend under /en/services/${serviceKey}${activeVariant ? `/${activeVariant}` : ""}.`);
       return true;
     } catch (err) {
       console.error(err);
@@ -296,37 +346,48 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteItem = async (sectionId: string, itemId: string) => {
-    if (!confirm("Delete this item?")) return;
+  const handleDeleteItem = async (item: ServiceContentItem) => {
+    if (!confirm(`[CRITICAL ALERT] Deleting this record will clear 1 card slot from the live grid under subtype: ${item.subtype}. Proceed?`)) return;
     const newContent = JSON.parse(JSON.stringify(content));
-    const sec = newContent!.sections.find((s: Section) => s.id === sectionId);
-    if (!sec) return;
-    sec.items = sec.items.filter((i: SectionItem) => i.id !== itemId);
-
-    // flag if last remaining
-    if (sec.items.length === 0) {
-      // leave empty section (per user request)
-    }
+    if (!newContent?.items) return;
+    newContent.items = newContent.items.filter((i: ServiceContentItem) => i.id !== item.id);
 
     setLoading(true);
     try {
-      const res = await fetch(`/api/service-content`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newContent),
+      const query = new URLSearchParams({ serviceKey, locale: "en" });
+      if (variant) query.set("variant", variant);
+      query.set("itemId", item.id);
+      const res = await fetch(`/api/service-content?${query.toString()}`, {
+        method: "DELETE",
       });
       if (!res.ok) {
-        setStatus("Failed to save after delete");
+        setStatus("Failed to delete item from service content");
         return;
       }
       setContent(newContent);
       setStatus("Item deleted.");
     } catch (err) {
       console.error(err);
-      setStatus("Failed to save after delete");
+      setStatus("Failed to delete item from service content");
     } finally {
       setLoading(false);
     }
+  };
+
+  const groupedItems = (content?.items || []).reduce<Record<string, ServiceContentItem[]>>((acc, item) => {
+    const key = item.subtype || "Unknown";
+    acc[key] = acc[key] || [];
+    acc[key].push(item);
+    return acc;
+  }, {});
+
+  const resolveMediaUrl = (value: string) => {
+    if (!value) return "";
+    if (/^(https?:)?\/\//i.test(value) || value.startsWith("data:") || value.startsWith("blob:")) return value;
+    if (typeof window !== "undefined") {
+      return value.startsWith("/") ? `${window.location.origin}${value}` : `${window.location.origin}/${value}`;
+    }
+    return value;
   };
 
   if (!authorized) return null;
@@ -371,16 +432,51 @@ export default function AdminPage() {
 
       <div className="mt-8">
         <div className="mt-4 space-y-6">
-          {content?.sections.map((section) => (
-            <div key={section.id} className="rounded-2xl border p-4 bg-white">
+          {Object.keys(groupedItems).length === 0 ? (
+            <div className="rounded-2xl border p-6 bg-white text-slate-600">No items found for this slot yet.</div>
+          ) : null}
+          {Object.entries(groupedItems).map(([subtypeLabel, items]) => (
+            <div key={subtypeLabel} className="rounded-2xl border p-4 bg-white">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="text-lg font-semibold text-slate-900">{subtypeLabel}</h3>
+                <span className="text-sm text-slate-500">{items.length} card slot{items.length === 1 ? "" : "s"}</span>
+              </div>
               <div className="mt-3 grid gap-4 sm:grid-cols-2">
-                {section.items.map((item) => (
-                  <div key={item.id} className="rounded-lg border p-3 bg-slate-50">
-                    {item.imageUrl ? <img src={item.imageUrl} alt={item.title} className="mb-2 h-32 w-full object-cover" /> : null}
-                    <p className="font-semibold">{item.title}</p>
-                    <p className="text-sm text-slate-600">{item.description}</p>
+                {items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded-lg border p-3 bg-slate-50"
+                    data-category={item.vertical_tab}
+                    data-subtype={item.subtype}
+                  >
+                    {item.media_type === "video" ? (
+                      <video
+                        src={item.media_url}
+                        className="w-full h-48 sm:h-56 object-cover object-center"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      />
+                    ) : (
+                      <img
+                        src={resolveMediaUrl(item.media_url)}
+                        alt={item.title}
+                        className="w-full h-48 sm:h-56 object-cover object-center clip-bounds layout-equalizer"
+                      />
+                    )}
+                    <p className="mt-3 font-semibold line-clamp-1">{item.title}</p>
+                    <p className="mt-2 text-sm text-slate-600 line-clamp-3 h-16">{item.description_short}</p>
+                    <a href={item.action_link || "#"} className="mt-3 inline-flex text-sm font-semibold text-brand-green">
+                      View projects →
+                    </a>
                     <div className="mt-2 flex gap-2">
-                      <button onClick={() => handleDeleteItem(section.id, item.id)} className="rounded px-3 py-1 text-sm bg-red-100 text-red-700">Delete</button>
+                      <button
+                        onClick={() => handleDeleteItem(item)}
+                        className="rounded px-3 py-1 text-sm bg-red-100 text-red-700"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -493,10 +589,29 @@ export default function AdminPage() {
   );
 }
 
-function AddItemForm({ onAdd, loading, subtype }: { onAdd: (payload: { title: string; short: string; detailed?: string; imageFile?: File }) => Promise<boolean>; loading: boolean; subtype: string }) {
+function AddItemForm({
+  onAdd,
+  loading,
+  subtype,
+}: {
+  onAdd: (payload: {
+    title: string;
+    short: string;
+    detailed?: string;
+    mediaType: "image" | "video";
+    mediaUrl: string;
+    actionLink: string;
+    imageFile?: File;
+  }) => Promise<boolean>;
+  loading: boolean;
+  subtype: string;
+}) {
   const [title, setTitle] = useState("");
   const [shortDesc, setShortDesc] = useState("");
   const [detailed, setDetailed] = useState("");
+  const [mediaType, setMediaType] = useState<"image" | "video">("image");
+  const [mediaUrl, setMediaUrl] = useState("");
+  const [actionLink, setActionLink] = useState("");
   const [file, setFile] = useState<File | undefined>(undefined);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
 
@@ -520,11 +635,22 @@ function AddItemForm({ onAdd, loading, subtype }: { onAdd: (payload: { title: st
   };
 
   const handleClick = async () => {
-    const success = await onAdd({ title, short: shortDesc, detailed, imageFile: file });
+    const success = await onAdd({
+      title,
+      short: shortDesc,
+      detailed,
+      mediaType,
+      mediaUrl,
+      actionLink,
+      imageFile: file,
+    });
     if (!success) return;
+
     setTitle("");
     setShortDesc("");
     setDetailed("");
+    setMediaUrl("");
+    setActionLink("");
     setFile(undefined);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
@@ -536,14 +662,72 @@ function AddItemForm({ onAdd, loading, subtype }: { onAdd: (payload: { title: st
     <div className="mt-6 rounded-2xl border p-4 bg-slate-50">
       <h3 className="font-semibold">Add new item — {subtype}</h3>
       <div className="grid gap-3 sm:grid-cols-2 mt-3">
-        <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} className="px-3 py-2 rounded border" />
-        <input placeholder="Short description" value={shortDesc} onChange={(e) => setShortDesc(e.target.value)} className="px-3 py-2 rounded border" />
+        <input
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="px-3 py-2 rounded border"
+        />
+        <input
+          placeholder="Short description"
+          value={shortDesc}
+          onChange={(e) => setShortDesc(e.target.value)}
+          className="px-3 py-2 rounded border"
+        />
       </div>
-      <textarea placeholder="Detailed description" value={detailed} onChange={(e) => setDetailed(e.target.value)} className="w-full mt-3 px-3 py-2 rounded border" rows={4} />
+      <textarea
+        placeholder="Detailed description"
+        value={detailed}
+        onChange={(e) => setDetailed(e.target.value)}
+        className="w-full mt-3 px-3 py-2 rounded border"
+        rows={4}
+      />
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <select
+          className="rounded border px-3 py-2"
+          value={mediaType}
+          onChange={(e) => setMediaType(e.target.value as "image" | "video")}
+        >
+          <option value="image">Image</option>
+          <option value="video">Video</option>
+        </select>
+        <input
+          placeholder="Action link"
+          value={actionLink}
+          onChange={(e) => setActionLink(e.target.value)}
+          className="px-3 py-2 rounded border"
+        />
+      </div>
+      {mediaType === "video" ? (
+        <div className="mt-3">
+          <input
+            className="w-full rounded border px-3 py-2"
+            placeholder="Video URL"
+            value={mediaUrl}
+            onChange={(e) => setMediaUrl(e.target.value)}
+          />
+        </div>
+      ) : (
+        <>
+          <div className="mt-3">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e.target.files?.[0])}
+              className="w-full rounded border px-3 py-2"
+            />
+          </div>
+          <div className="mt-3">
+            <input
+              className="w-full rounded border px-3 py-2"
+              placeholder="Image URL (optional if uploading file)"
+              value={mediaUrl}
+              onChange={(e) => setMediaUrl(e.target.value)}
+            />
+          </div>
+        </>
+      )}
 
-      <div className="mt-3">
-        <input type="file" accept="image/*" onChange={(e) => handleFileChange(e.target.files?.[0])} className="w-full px-3 py-2 rounded border" />
-      </div>
       {previewUrl ? (
         <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white p-3">
           <img src={previewUrl} alt="Preview" className="h-48 w-full object-cover" />
