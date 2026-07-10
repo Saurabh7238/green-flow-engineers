@@ -21,6 +21,7 @@ type SectionItem = { id: string; title: string; description?: string; imageUrl?:
 type Section = { id: string; label: string; items: SectionItem[] };
 type ServiceContent = { serviceKey: ServiceKey; locale: string; variant?: string; title: string; description: string; imageUrl?: string; items: ServiceContentItem[]; sections?: Section[] };
 type SliderItem = { id: string; sequence: number; mediaType: "image" | "video"; assetUrl: string; headline?: string; actionLink?: string; boundaryClass?: string; aspect?: string };
+type CustomerQuote = { id: string; quote: string; author: string; designation?: string };
 
 const SUBTYPE_MAP: Record<string, string[]> = {
   water: ["Water Treatment Plant (WTP)", "Sewage Treatment Plant (STP)", "Effluent Treatment Plant (ETP)", "Industrial RO System"],
@@ -120,6 +121,12 @@ export default function AdminPage() {
   const [sliderAssetUrl, setSliderAssetUrl] = useState("");
   const [sliderFile, setSliderFile] = useState<File | null>(null);
   const [sliderPreviewUrl, setSliderPreviewUrl] = useState<string>("");
+  const [quotes, setQuotes] = useState<CustomerQuote[]>([]);
+  const [quoteText, setQuoteText] = useState("");
+  const [quoteAuthor, setQuoteAuthor] = useState("");
+  const [quoteDesignation, setQuoteDesignation] = useState("");
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [quoteStatus, setQuoteStatus] = useState("");
 
   useEffect(() => {
     const user = typeof window !== "undefined" && localStorage.getItem("greenflow-current-user");
@@ -140,6 +147,7 @@ export default function AdminPage() {
     if (!authorized) return;
     loadContent();
     loadSlides();
+    loadQuotes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authorized]);
 
@@ -238,6 +246,64 @@ export default function AdminPage() {
       console.error(err);
     } finally {
       setSliderLoading(false);
+    }
+  };
+
+  const loadQuotes = async () => {
+    try {
+      const response = await fetch("/api/quotes");
+      const data = await response.json();
+      if (response.ok && data.success) setQuotes(data.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleCreateQuote = async () => {
+    if (!quoteText.trim() || !quoteAuthor.trim()) {
+      setQuoteStatus("Quote and customer name are required.");
+      return;
+    }
+
+    setQuoteLoading(true);
+    setQuoteStatus("");
+    try {
+      const response = await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quote: quoteText, author: quoteAuthor, designation: quoteDesignation }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        setQuoteStatus(data.error || "Failed to add customer quote.");
+        return;
+      }
+      setQuoteText("");
+      setQuoteAuthor("");
+      setQuoteDesignation("");
+      setQuoteStatus("Customer quote added.");
+      await loadQuotes();
+    } catch (error) {
+      console.error(error);
+      setQuoteStatus("Failed to add customer quote.");
+    } finally {
+      setQuoteLoading(false);
+    }
+  };
+
+  const handleDeleteQuote = async (quoteId: string) => {
+    if (!confirm("Delete this customer quote?")) return;
+    try {
+      const response = await fetch(`/api/quotes?id=${encodeURIComponent(quoteId)}`, { method: "DELETE" });
+      if (!response.ok) {
+        setQuoteStatus("Failed to delete customer quote.");
+        return;
+      }
+      setQuoteStatus("Customer quote deleted.");
+      await loadQuotes();
+    } catch (error) {
+      console.error(error);
+      setQuoteStatus("Failed to delete customer quote.");
     }
   };
 
@@ -635,6 +701,51 @@ export default function AdminPage() {
         </div>
 
         <p className="mt-4 text-sm text-slate-600">{sliderStatus}</p>
+      </div>
+
+      <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-2xl font-semibold">Customer Quotes Manager</h2>
+        <p className="mt-1 text-sm text-slate-600">Add client testimonials to the quotes section on the homepage.</p>
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-2xl border bg-slate-50 p-4 space-y-3">
+            <textarea
+              className="min-h-32 w-full rounded border px-3 py-2"
+              placeholder="Customer quote"
+              value={quoteText}
+              onChange={(event) => setQuoteText(event.target.value)}
+            />
+            <input
+              className="w-full rounded border px-3 py-2"
+              placeholder="Customer name"
+              value={quoteAuthor}
+              onChange={(event) => setQuoteAuthor(event.target.value)}
+            />
+            <input
+              className="w-full rounded border px-3 py-2"
+              placeholder="Designation or company (optional)"
+              value={quoteDesignation}
+              onChange={(event) => setQuoteDesignation(event.target.value)}
+            />
+            <button onClick={handleCreateQuote} disabled={quoteLoading} className="rounded bg-brand-green px-4 py-2 font-semibold text-white">
+              {quoteLoading ? "Saving..." : "Add quote"}
+            </button>
+          </div>
+          <div className="rounded-2xl border bg-slate-50 p-4">
+            <h3 className="font-semibold">Published Quotes</h3>
+            <div className="mt-4 space-y-3">
+              {quotes.length === 0 ? <p className="text-sm text-slate-600">No customer quotes yet.</p> : null}
+              {quotes.map((item) => (
+                <div key={item.id} className="rounded-lg border bg-white p-3">
+                  <p className="text-sm text-slate-700">“{item.quote}”</p>
+                  <p className="mt-2 font-semibold">{item.author}</p>
+                  {item.designation ? <p className="text-sm text-slate-500">{item.designation}</p> : null}
+                  <button onClick={() => handleDeleteQuote(item.id)} className="mt-3 rounded bg-red-100 px-3 py-1 text-sm text-red-700">Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <p className="mt-4 text-sm text-slate-600">{quoteStatus}</p>
       </div>
     </div>
   );

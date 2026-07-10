@@ -42,6 +42,8 @@
     "introTitle": "Trusted Industrial Engineering Partner",
     "introText": "From WTP/STP/ETP plants to textile machinery commissioning, we combine technical expertise with a commitment to environmental responsibility. Based in Kanpur, we serve clients across Uttar Pradesh and India with reliable, energy-efficient solutions.",
     "servicesOverview": "What We Deliver",
+    "quotesTitle": "What Our Clients Say",
+    "quotesSubtitle": "Client Testimonials",
     "whyUsTitle": "Why Green Flow Engineers?",
     "whyUs": {
       "experience": "End-to-end supply, installation & commissioning",
@@ -139,14 +141,33 @@
   "about": {
     "title": "About Green Flow Engineers",
     "visionTitle": "Our Vision",
-    "vision": "To be India's most trusted partner for sustainable industrial engineering — enabling businesses to grow responsibly while protecting natural resources.",
+    "vision": "To become India's most trusted engineering solutions company by delivering innovative, sustainable, and technology-driven industrial infrastructure that empowers businesses, protects the environment, and builds a greener future.",
+    "visionTagline": "Engineering Excellence. Sustainable Innovation. Lasting Impact.",
     "missionTitle": "Our Mission",
-    "mission": "We deliver reliable, energy-efficient engineering solutions through expert installation, commissioning, and lifecycle support — helping clients achieve operational excellence with minimal environmental impact.",
+    "mission": "We are committed to delivering engineering solutions that create measurable, lasting value.",
+    "missionItems": [
+      "To deliver high-quality engineering solutions with precision, innovation, and reliability.",
+      "To provide end-to-end services—from design and supply to installation, commissioning, and maintenance.",
+      "To help industries improve efficiency through advanced and sustainable technologies.",
+      "To maintain the highest standards of safety, quality, and customer satisfaction in every project.",
+      "To build long-term partnerships through transparency, timely execution, and continuous support.",
+      "To contribute to environmental sustainability with eco-friendly water treatment and energy-efficient engineering solutions."
+    ],
     "sustainabilityTitle": "Sustainability Focus",
     "sustainability": "Every project we undertake prioritizes water conservation, energy efficiency, and safe working environments. From RO plants that reduce wastewater to LED retrofits that cut power consumption, sustainability is built into our engineering DNA.",
+    "coreValuesTitle": "Core Values",
+    "coreValues": [
+      "Innovation",
+      "Integrity",
+      "Quality",
+      "Safety First",
+      "Sustainability",
+      "Customer Commitment",
+      "Excellence in Execution"
+    ],
     "directorTitle": "Leadership",
     "directorName": "Mahesh Yadav",
-    "directorRole": "Director",
+    "directorRole": "Managing Director",
     "directorBio": "Mahesh Yadav leads Green Flow Engineers with decades of hands-on experience in industrial plant installation, water treatment, and HVAC systems. His vision drives our commitment to quality workmanship and long-term client partnerships."
   },
   "contact": {

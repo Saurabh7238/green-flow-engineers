@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { GalleryPreview } from "@/components/GalleryPreview";
 import { ServiceCard } from "@/components/ServiceCard";
 import { HomeSlider } from "@/components/HomeSlider";
+import { QuotesSection } from "@/components/QuotesSection";
 import { serviceKeys } from "@/data/services";
 import { blogPosts } from "@/data/blog";
 import { getSiteContent } from "@/lib/site-content";
@@ -28,8 +29,10 @@ export default async function HomePage({ params }: Props) {
   const tCta = await getTranslations("cta");
   const tNav = await getTranslations("nav");
   const tCat = await getTranslations("categories");
+  const tAbout = await getTranslations("about");
   const loc = locale as "en" | "hi";
   const dbContent = await getSiteContent();
+  const coreValues = tAbout.raw("coreValues") as string[];
 
   const featuredPosts = blogPosts.slice(0, 3);
 
@@ -73,6 +76,20 @@ export default async function HomePage({ params }: Props) {
         </ul>
       </section>
 
+      <section className="bg-slate-100/80 py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="text-2xl font-bold text-slate-900">{tAbout("coreValuesTitle")}</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {coreValues.map((value) => (
+              <div key={value} className="rounded-xl border border-slate-200 bg-white p-5 font-semibold text-slate-800 shadow-sm">
+                <span className="mr-2 text-brand-green" aria-hidden>✓</span>
+                {value}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <GalleryPreview locale={locale} />
 
       <section className="border-t border-slate-200 bg-white py-16">
@@ -111,6 +128,8 @@ export default async function HomePage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      <QuotesSection title={t("quotesTitle")} subtitle={t("quotesSubtitle")} />
     </>
   );
 }

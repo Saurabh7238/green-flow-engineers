@@ -14,7 +14,7 @@ export async function Footer() {
 
   return (
     <footer className="mt-auto border-t border-slate-200 bg-slate-900 text-slate-300">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 md:grid-cols-3">
         <div>
           <div className="[&_span]:text-white [&_.text-brand-green-dark]:text-emerald-400">
             <Logo locale={locale} size="sm" />
@@ -60,7 +60,7 @@ export async function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+      <div className="border-t border-slate-800 py-3 text-center text-xs text-slate-500">
         © {new Date().getFullYear()} Green Flow Engineers. {t("rights")}
       </div>
     </footer>

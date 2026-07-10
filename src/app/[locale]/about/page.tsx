@@ -16,6 +16,7 @@ export default async function AboutPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("about");
   const dbContent = await getSiteContent();
+  const missionItems = t.raw("missionItems") as string[];
 
   return (
     <>
@@ -25,10 +26,21 @@ export default async function AboutPage({ params }: Props) {
           <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
             <h2 className="text-lg font-bold text-brand-green-dark">{t("visionTitle")}</h2>
             <p className="mt-3 text-slate-600 leading-relaxed">{dbContent.aboutVision || t("vision")}</p>
+            {!dbContent.aboutVision ? (
+              <p className="mt-4 font-semibold tracking-wide text-brand-green-dark">{t("visionTagline")}</p>
+            ) : null}
           </section>
           <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
             <h2 className="text-lg font-bold text-brand-blue">{t("missionTitle")}</h2>
-            <p className="mt-3 text-slate-600 leading-relaxed">{dbContent.aboutMission || t("mission")}</p>
+            {dbContent.aboutMission ? (
+              <p className="mt-3 text-slate-600 leading-relaxed">{dbContent.aboutMission}</p>
+            ) : (
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-slate-600 marker:text-brand-blue">
+                {missionItems.map((item) => (
+                  <li key={item} className="leading-relaxed">{item}</li>
+                ))}
+              </ul>
+            )}
           </section>
         </div>
 
