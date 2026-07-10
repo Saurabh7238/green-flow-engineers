@@ -18,6 +18,24 @@ const waterPlantOptions = [
   "industrial-ro-system",
 ] as const;
 
+const rackSystemOptions = [
+  "pallet-rack-heavy-duty-rack",
+  "cantilever-rack",
+  "fifo-flow-rack-gravity-flow",
+  "mezzanine-floor-multi-tier-system",
+  "long-span-rack-medium-duty-rack",
+  "slotted-angle-rack",
+  "supermarket-rack-display-rack",
+  "mobile-compacter",
+] as const;
+
+const hvacSystemOptions = [
+  "industrial-humidification-plant",
+  "air-handling-unit-ahu",
+  "complete-hvac-system",
+  "ventilation-exhaust-system",
+] as const;
+
 const fallbackRackItems = [
   "Slotted Angle Rack",
   "Multi-Tier Racking System",
@@ -72,6 +90,7 @@ export default async function ServiceDetailPage({ params }: Props) {
   const servicesT = await getTranslations({ locale, namespace: "services" });
   const isWaterService = serviceKey === "water";
   const isRackService = serviceKey === "racks";
+  const isHvacService = serviceKey === "hvac";
   const isTextileService = serviceKey === "textile";
   const rackTypes = (isRackService ? (t.raw("rackTypes") as string[] | undefined) : undefined) ?? [];
   const textileMachineryTypes = (isTextileService ? (t.raw("machineryTypes") as string[] | undefined) : undefined) ?? [];
@@ -135,19 +154,19 @@ export default async function ServiceDetailPage({ params }: Props) {
           ← {servicesT("title")}
         </Link>
 
-        {isWaterService ? (
+        {isWaterService || isRackService || isHvacService ? (
           <div className="grid gap-6 md:grid-cols-2">
-            {waterPlantOptions.map((plantKey) => (
+            {(isWaterService ? waterPlantOptions : isRackService ? rackSystemOptions : hvacSystemOptions).map((optionKey) => (
               <Link
-                key={plantKey}
-                href={`/${locale}/services/${serviceKey}/${plantKey}`}
+                key={optionKey}
+                href={`/${locale}/services/${serviceKey}/${optionKey}`}
                 className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-brand-green/40 hover:shadow-md"
               >
                 <h2 className="text-xl font-semibold text-slate-900">
-                  {servicesT(`waterPlants.${plantKey}.title`)}
+                  {servicesT(`${isWaterService ? "waterPlants" : isRackService ? "rackSystems" : "hvacSystems"}.${optionKey}.title`)}
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                  {servicesT(`waterPlants.${plantKey}.description`)}
+                  {servicesT(`${isWaterService ? "waterPlants" : isRackService ? "rackSystems" : "hvacSystems"}.${optionKey}.description`)}
                 </p>
                 <span className="mt-5 inline-flex text-sm font-semibold text-brand-green">
                   View projects →

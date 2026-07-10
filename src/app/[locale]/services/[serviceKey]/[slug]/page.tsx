@@ -18,6 +18,24 @@ const waterPlantOptions = [
   "industrial-ro-system",
 ] as const;
 
+const rackSystemOptions = [
+  "pallet-rack-heavy-duty-rack",
+  "cantilever-rack",
+  "fifo-flow-rack-gravity-flow",
+  "mezzanine-floor-multi-tier-system",
+  "long-span-rack-medium-duty-rack",
+  "slotted-angle-rack",
+  "supermarket-rack-display-rack",
+  "mobile-compacter",
+] as const;
+
+const hvacSystemOptions = [
+  "industrial-humidification-plant",
+  "air-handling-unit-ahu",
+  "complete-hvac-system",
+  "ventilation-exhaust-system",
+] as const;
+
 const fallbackRackItems = [
   "Slotted Angle Rack",
   "Multi-Tier Racking System",
@@ -62,8 +80,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: t("title"), description: t("description") };
   }
 
-  if (serviceKey === "racks") {
-    return { title: slug.replace(/-/g, " ") };
+  if (serviceKey === "racks" || serviceKey === "hvac") {
+    const options = serviceKey === "racks" ? rackSystemOptions : hvacSystemOptions;
+    const namespace = serviceKey === "racks" ? "rackSystems" : "hvacSystems";
+    if (!options.some((option) => option === slug)) {
+      return { title: serviceKey === "racks" ? "Storage Rack" : "HVAC System" };
+    }
+    const t = await getTranslations({ locale, namespace: `services.${namespace}.${slug}` });
+    return { title: t("title"), description: t("description") };
   }
 
   return { title: "Service Detail" };
@@ -154,34 +178,22 @@ export default async function ServiceSlugPage({ params }: Props) {
     );
   }
 
-  if (serviceKey === "racks") {
-    const sectionItem = serviceContent?.sections
-      ?.flatMap((section) => section.items)
-      .find((entry) => slugify(entry.title) === slug);
-    const plainItem = serviceContent?.items?.find((entry) => slugify(entry.title) === slug);
-    const rawItem = sectionItem || plainItem || fallbackRackItems.find((entry) => slugify(entry.title) === slug);
-
-    if (!rawItem) {
+  if (serviceKey === "racks" || serviceKey === "hvac") {
+    const options = serviceKey === "racks" ? rackSystemOptions : hvacSystemOptions;
+    const namespace = serviceKey === "racks" ? "rackSystems" : "hvacSystems";
+    if (!options.some((option) => option === slug)) {
       notFound();
     }
-
-    const item = {
-      title: rawItem.title,
-      description:
-        "description" in rawItem
-          ? rawItem.description
-          : rawItem.description_short || "Detailed information for this storage solution will appear here once added from the admin panel.",
-      imageUrl:
-        "imageUrl" in rawItem
-          ? rawItem.imageUrl || ""
-          : "media_url" in rawItem
-            ? rawItem.media_url || ""
-            : "",
-    };
+    const t = await getTranslations({ locale, namespace: `services.${namespace}.${slug}` });
+    const rackSections = serviceContent?.sections?.length
+      ? serviceContent.sections
+      : serviceContent?.items?.length
+        ? [{ id: slug, label: serviceContent.title || t("title"), items: serviceContent.items.map((item) => ({ id: item.id, title: item.title, description: item.description_short, imageUrl: item.media_url || "", alt: item.title })) }]
+        : [];
 
     return (
       <>
-        <PageHeader title={item.title} subtitle={servicesT("subtitle")}>
+        <PageHeader title={t("title")} subtitle={servicesT("subtitle")}>
           <PrintButton />
         </PageHeader>
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
@@ -190,18 +202,35 @@ export default async function ServiceSlugPage({ params }: Props) {
           </Link>
 
           <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-            {item.imageUrl ? (
+            {serviceContent?.imageUrl ? (
               <div className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
                 <div className="overflow-hidden rounded-[1.25rem] border border-slate-200 bg-slate-100">
-                  <img src={item.imageUrl} alt={item.title} className="h-80 w-full object-cover" />
+                  <img src={serviceContent.imageUrl} alt={serviceContent.title || t("title")} className="h-80 w-full object-cover" />
                 </div>
               </div>
             ) : null}
-            <h1 className="mt-6 text-3xl font-semibold text-slate-900">{item.title}</h1>
-            <p className="mt-4 text-base leading-relaxed text-slate-700">
-              {item.description || "Detailed information for this storage solution will appear here once added from the admin panel."}
-            </p>
+            <h1 className="mt-6 text-3xl font-semibold text-slate-900">{serviceContent?.title || t("title")}</h1>
+            <p className="mt-4 text-base leading-relaxed text-slate-700">{serviceContent?.description || t("description")}</p>
           </div>
+
+          {rackSections.length ? (
+            <div className="mt-6 space-y-6">
+              {rackSections.map((section) => (
+                <div key={section.id} className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+                  <h2 className="text-2xl font-semibold text-slate-900">{section.label}</h2>
+                  <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                    {section.items.map((item) => (
+                      <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        {item.imageUrl ? <img src={item.imageUrl} alt={item.alt || item.title} className="mb-4 h-48 w-full rounded-2xl object-cover" /> : null}
+                        <h3 className="text-sm font-semibold text-slate-900">{item.title}</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </>
     );

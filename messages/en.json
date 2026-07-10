@@ -76,6 +76,22 @@
         "description": "High-performance reverse osmosis plants for ultrapure water and process water requirements."
       }
     },
+    "rackSystems": {
+      "pallet-rack-heavy-duty-rack": { "title": "Industrial Heavy Duty Storage Racks", "description": "High-capacity pallet racking engineered for safe, efficient warehouse storage and material handling." },
+      "cantilever-rack": { "title": "Cantilever Racks", "description": "Open-front storage systems for long, bulky, and irregularly shaped materials." },
+      "fifo-flow-rack-gravity-flow": { "title": "FIFO Flow Racks", "description": "Gravity-fed racking systems that support first-in, first-out inventory flow." },
+      "mezzanine-floor-multi-tier-system": { "title": "Mezzanine Floor & Multi-Tier Systems", "description": "Space-efficient multi-level storage platforms tailored to your facility." },
+      "long-span-rack-medium-duty-rack": { "title": "Long Span & Medium Duty Racks", "description": "Versatile shelving for cartons, components, and hand-loaded inventory." },
+      "slotted-angle-rack": { "title": "Slotted Angle Racks", "description": "Flexible, economical storage racks for light and medium-duty applications." },
+      "supermarket-rack-display-rack": { "title": "Supermarket & Display Racks", "description": "Durable retail display systems designed for organised, accessible merchandising." },
+      "mobile-compacter": { "title": "Mobile Compacters", "description": "High-density mobile storage systems that maximise available floor space." }
+    },
+    "hvacSystems": {
+      "industrial-humidification-plant": { "title": "Industrial Humidification Plant", "description": "Precision humidity control systems for production quality, worker comfort, and process stability." },
+      "air-handling-unit-ahu": { "title": "Air Handling Unit (AHU)", "description": "Efficient air treatment and circulation units for clean, conditioned indoor environments." },
+      "complete-hvac-system": { "title": "Complete HVAC System", "description": "End-to-end heating, ventilation, and air-conditioning systems designed for your facility." },
+      "ventilation-exhaust-system": { "title": "Ventilation & Exhaust System", "description": "Reliable fresh-air and exhaust solutions for safer, healthier industrial spaces." }
+    },
     "items": {
       "water": {
         "title": "WTP / STP / ETP & Industrial RO Systems",
