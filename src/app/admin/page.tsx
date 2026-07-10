@@ -68,6 +68,40 @@ const VARIANT_MAP: Partial<Record<ServiceKey, Record<string, string>>> = {
 
 const resolveVariant = (service: ServiceKey, subtypeValue: string) => VARIANT_MAP[service]?.[subtypeValue] || undefined;
 
+const MAX_UPLOAD_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_UPLOAD_DIMENSION = 1600;
+
+const compressImageFile = async (file: File) => {
+  if (!file.type.startsWith("image/")) return file;
+
+  const imageBitmap = await createImageBitmap(file);
+  const { width, height } = imageBitmap;
+  const scale = Math.min(1, MAX_UPLOAD_DIMENSION / Math.max(width, height));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(width * scale));
+  canvas.height = Math.max(1, Math.round(height * scale));
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    imageBitmap.close?.();
+    return file;
+  }
+
+  context.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
+  imageBitmap.close?.();
+
+  const mimeType = file.type === "image/png" ? "image/webp" : file.type === "image/gif" ? "image/webp" : "image/webp";
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob((nextBlob) => resolve(nextBlob), mimeType, 0.82);
+  });
+
+  if (!blob) return file;
+
+  const outputFile = new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), { type: mimeType });
+  return outputFile.size <= file.size ? outputFile : file;
+};
+
 export default function AdminPage() {
   const router = useRouter();
   const [authorized, setAuthorized] = useState(false);
@@ -169,9 +203,26 @@ export default function AdminPage() {
   };
 
   const uploadImage = async (file: File) => {
+    const preparedFile = file.size > MAX_UPLOAD_SIZE_BYTES ? await compressImageFile(file) : file;
+    if (preparedFile.size > MAX_UPLOAD_SIZE_BYTES) {
+      return { success: false, error: `Image must be smaller than ${Math.round(MAX_UPLOAD_SIZE_BYTES / (1024 * 1024))} MB` };
+    }
+
     const form = new FormData();
-    form.append("image", file);
+    form.append("image", preparedFile);
     const res = await fetch("/api/upload-image", { method: "POST", body: form });
+
+    if (!res.ok) {
+      let errorMessage = "Image upload failed";
+      try {
+        const data = await res.json();
+        if (data?.error) errorMessage = data.error;
+      } catch {
+        // Ignore invalid JSON and use the fallback message.
+      }
+      return { success: false, error: errorMessage };
+    }
+
     return res.ok ? await res.json() : null;
   };
 
@@ -204,7 +255,7 @@ export default function AdminPage() {
       if (sliderMediaType === "image" && sliderFile) {
         const up = await uploadImage(sliderFile);
         if (!up?.success) {
-          setSliderStatus("Image upload failed.");
+          setSliderStatus(up?.error || "Image upload failed.");
           return;
         }
         assetUrl = up.url;
@@ -294,7 +345,7 @@ export default function AdminPage() {
     if (payload.mediaType === "image" && payload.imageFile) {
       const up = await uploadImage(payload.imageFile);
       if (!up?.success) {
-        setStatus("Image upload failed");
+        setStatus(up?.error || "Image upload failed");
         return false;
       }
       mediaUrl = up.url;

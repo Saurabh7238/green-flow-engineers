@@ -3,7 +3,7 @@ import { GridFSBucket, ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 
 const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const maxSizeBytes = 3 * 1024 * 1024;
+const maxSizeBytes = 2 * 1024 * 1024;
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     if (buffer.byteLength > maxSizeBytes) {
-      return NextResponse.json({ error: "Image must be smaller than 3 MB" }, { status: 400 });
+      return NextResponse.json({ error: `Image must be smaller than ${Math.round(maxSizeBytes / (1024 * 1024))} MB` }, { status: 413 });
     }
 
     const db = await getDb();
