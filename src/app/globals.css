@@ -20,9 +20,31 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgb(5 150 105 / 12%), transparent 26rem),
+    radial-gradient(circle at 88% 14%, rgb(2 132 199 / 10%), transparent 24rem),
+    radial-gradient(circle at 48% 88%, rgb(5 150 105 / 8%), transparent 30rem);
+  background-size: 140% 140%;
+  animation: ambient-background 18s ease-in-out infinite alternate;
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@keyframes ambient-background {
+  from {
+    background-position: 0% 0%, 100% 0%, 50% 100%;
+  }
+
+  to {
+    background-position: 16% 12%, 82% 18%, 42% 82%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
 }
 
 @media print {
