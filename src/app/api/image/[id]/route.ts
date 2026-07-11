@@ -26,9 +26,14 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
 
+    const contentType =
+      typeof file.metadata?.contentType === "string"
+        ? file.metadata.contentType
+        : "application/octet-stream";
+
     return new NextResponse(Buffer.concat(chunks), {
       headers: {
-        "Content-Type": file.contentType || "application/octet-stream",
+        "Content-Type": contentType,
         "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
