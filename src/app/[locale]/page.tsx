@@ -40,6 +40,28 @@ export default async function HomePage({ params }: Props) {
     <>
       <HomeSlider />
 
+      <section className="border-b border-emerald-100 bg-gradient-to-b from-emerald-50/70 to-white py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand-green">Green Flow Engineers</p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+              Engineering Progress. Inspiring Sustainability.
+            </h1>
+            <p className="mt-4 text-sm font-semibold text-slate-600">Established in 2025 | Kanpur, Uttar Pradesh</p>
+            <p className="mt-6 text-base leading-relaxed text-slate-700">
+              Green Flow Engineers is a trusted engineering solutions provider based in Kanpur, Uttar Pradesh. Since 2025,
+              we have been delivering advanced, sustainable, and reliable systems for industrial and commercial sectors across India.
+            </p>
+            <p className="mt-4 text-base leading-relaxed text-slate-700">
+              Driven by innovation, quality, and environmental responsibility, we focus on precision engineering, timely project
+              execution, and long-term customer satisfaction. Our goal is to build infrastructure that improves efficiency, reduces
+              environmental impact, and meets global quality standards.
+            </p>
+          </div>
+
+        </div>
+      </section>
+
       <section className="bg-slate-100/80 py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-10 flex flex-wrap items-end justify-between gap-4">

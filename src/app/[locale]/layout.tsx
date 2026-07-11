@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { EnquiryPopup } from "@/components/EnquiryPopup";
 import { NotificationPopup } from "@/components/NotificationPopup";
 
 type Props = {
@@ -31,6 +32,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <main className="flex-1">{children}</main>
       <Footer />
       <NotificationPopup />
+      <EnquiryPopup />
     </NextIntlClientProvider>
   );
 }

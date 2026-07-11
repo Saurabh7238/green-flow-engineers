@@ -13,7 +13,7 @@ export async function Footer() {
     locale === "hi" ? siteConfig.address.hi : siteConfig.address.en;
 
   return (
-    <footer className="mt-auto border-t border-slate-200 bg-slate-900 text-slate-300">
+    <footer className="mt-auto border-t border-slate-200 bg-slate-900 pb-16 text-slate-300 sm:pb-20">
       <div className="mx-auto grid max-w-6xl gap-4 px-4 py-5 sm:gap-6 sm:px-6 sm:py-8 md:grid-cols-3">
         <div>
           <div className="[&_span]:text-white [&_.text-brand-green-dark]:text-emerald-400">
@@ -60,7 +60,7 @@ export async function Footer() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-6xl justify-center gap-2 border-t border-slate-800 px-4 py-3 sm:gap-3 sm:px-6 sm:py-5">
+      <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center gap-2 border-t border-slate-700 bg-slate-900/95 px-4 py-3 shadow-[0_-6px_20px_rgba(15,23,42,0.25)] backdrop-blur sm:gap-3 sm:px-6 sm:py-4">
         <a
           href={siteConfig.phoneHref}
           className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-600 px-2 py-2 text-xs font-semibold text-white transition hover:border-emerald-400 hover:text-emerald-400 sm:flex-none sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm"
@@ -71,7 +71,7 @@ export async function Footer() {
           Call Now
         </a>
         <Link
-          href={`/${locale}/contact`}
+          href={`/${locale}/enquiry`}
           className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-600 px-2 py-2 text-xs font-semibold text-white transition hover:border-emerald-400 hover:text-emerald-400 sm:flex-none sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm"
         >
           <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
