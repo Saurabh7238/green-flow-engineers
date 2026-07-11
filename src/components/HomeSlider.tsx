@@ -32,7 +32,7 @@ export function HomeSlider() {
 
   if (loading) {
     return (
-      <div className="w-full h-[400px] md:h-[600px] bg-slate-200 animate-pulse flex items-center justify-center">
+      <div className="aspect-[3/2] w-full bg-slate-200 animate-pulse flex items-center justify-center">
         <p className="text-slate-600">Loading slider...</p>
       </div>
     );
@@ -40,7 +40,7 @@ export function HomeSlider() {
 
   if (!slides || slides.length === 0) {
     return (
-      <div className="w-full h-[400px] md:h-[600px] bg-slate-100 flex items-center justify-center">
+      <div className="aspect-[3/2] w-full bg-slate-100 flex items-center justify-center">
         <p className="text-slate-500">No slides configured</p>
       </div>
     );
@@ -49,7 +49,7 @@ export function HomeSlider() {
   const activeSlide = slides[current];
 
   return (
-    <div className="relative w-full h-[400px] md:h-[600px] overflow-hidden rounded-lg bg-black">
+    <div className="relative aspect-[3/2] w-full overflow-hidden rounded-lg bg-black">
       {/* Slide Container */}
       <div className="relative w-full h-full">
         {activeSlide.mediaType === "image" ? (

@@ -124,6 +124,10 @@ export default async function ServiceSlugPage({ params }: Props) {
   const servicesT = await getTranslations({ locale, namespace: "services" });
   const activeVariant = getSlotVariant(serviceKey as ServiceKey, slug);
   const serviceContent = await getServiceContent(serviceKey as ServiceKey, locale, activeVariant);
+  const getFullItemDescription = (item: { id: string; description: string }) => {
+    const storedItem = serviceContent?.items?.find((contentItem) => contentItem.id === item.id);
+    return storedItem?.description_detailed || storedItem?.description_short || item.description;
+  };
 
   if (serviceKey === "water") {
     if (!waterPlantOptions.includes(slug as (typeof waterPlantOptions)[number])) {
@@ -141,7 +145,7 @@ export default async function ServiceSlugPage({ params }: Props) {
             items: serviceContent.items.map((item) => ({
               id: item.id,
               title: item.title,
-              description: item.description_short,
+              description: item.description_detailed || item.description_short,
               imageUrl: item.media_url || "",
               alt: item.title,
             })),
@@ -185,7 +189,7 @@ export default async function ServiceSlugPage({ params }: Props) {
                           </div>
                         ) : null}
                         <h3 className="text-sm font-semibold text-slate-900">{item.title}</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-600">{getFullItemDescription(item)}</p>
                       </div>
                     ))}
                   </div>
@@ -208,7 +212,7 @@ export default async function ServiceSlugPage({ params }: Props) {
     const rackSections = serviceContent?.sections?.length
       ? serviceContent.sections
       : serviceContent?.items?.length
-        ? [{ id: slug, label: serviceContent.title || t("title"), items: serviceContent.items.map((item) => ({ id: item.id, title: item.title, description: item.description_short, imageUrl: item.media_url || "", alt: item.title })) }]
+        ? [{ id: slug, label: serviceContent.title || t("title"), items: serviceContent.items.map((item) => ({ id: item.id, title: item.title, description: item.description_detailed || item.description_short, imageUrl: item.media_url || "", alt: item.title })) }]
         : [];
 
     return (
@@ -243,7 +247,7 @@ export default async function ServiceSlugPage({ params }: Props) {
                       <div key={item.id} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                         {item.imageUrl ? <img src={item.imageUrl} alt={item.alt || item.title} className="mb-4 h-48 w-full rounded-2xl object-cover" /> : null}
                         <h3 className="text-sm font-semibold text-slate-900">{item.title}</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-slate-600">{item.description}</p>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-600">{getFullItemDescription(item)}</p>
                       </div>
                     ))}
                   </div>
