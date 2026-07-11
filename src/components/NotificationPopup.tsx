@@ -64,7 +64,7 @@ export function NotificationPopup() {
       className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="notification-title"
+      aria-label={notification.title || "Website notification"}
       onClick={(event) => {
         // Only the backdrop closes the dialog; clicks inside the card do not.
         if (event.target === event.currentTarget) close();
@@ -88,24 +88,22 @@ export function NotificationPopup() {
           />
         ) : null}
 
-        <div className="p-6 sm:p-8">
-          <h2 id="notification-title" className="pr-10 text-2xl font-bold tracking-tight text-slate-900">
-            {notification.title}
-          </h2>
-          <p className="mt-3 whitespace-pre-line text-base leading-relaxed text-slate-600">
-            {notification.message}
-          </p>
+        {notification.title || notification.message || notification.file ? (
+          <div className="p-6 sm:p-8">
+            {notification.title ? <h2 className="pr-10 text-2xl font-bold tracking-tight text-slate-900">{notification.title}</h2> : null}
+            {notification.message ? <p className="mt-3 whitespace-pre-line text-base leading-relaxed text-slate-600">{notification.message}</p> : null}
 
-          {notification.file ? (
-            <a
-              href={notification.file}
-              download
-              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-green px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-green/90 focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2"
-            >
-              Download file
-            </a>
-          ) : null}
-        </div>
+            {notification.file ? (
+              <a
+                href={notification.file}
+                download
+                className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-green px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-green/90 focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2"
+              >
+                Download file
+              </a>
+            ) : null}
+          </div>
+        ) : null}
       </section>
     </div>
   );

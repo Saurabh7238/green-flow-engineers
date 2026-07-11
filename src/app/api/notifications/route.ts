@@ -34,10 +34,6 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const values = sanitizeNotification(await request.json());
-    if (!values.title || !values.message) {
-      return NextResponse.json({ error: "Title and message are required" }, { status: 400 });
-    }
-
     const db = await getDb();
     const collection = db.collection<Notification>(COLLECTION);
     if (values.active) await collection.updateMany({}, { $set: { active: false } });
@@ -57,10 +53,6 @@ export async function PUT(request: Request) {
     if (!body.id) return NextResponse.json({ error: "Notification id is required" }, { status: 400 });
 
     const values = sanitizeNotification(body);
-    if (!values.title || !values.message) {
-      return NextResponse.json({ error: "Title and message are required" }, { status: 400 });
-    }
-
     const db = await getDb();
     const collection = db.collection<Notification>(COLLECTION);
     if (values.active) await collection.updateMany({ id: { $ne: body.id } }, { $set: { active: false } });

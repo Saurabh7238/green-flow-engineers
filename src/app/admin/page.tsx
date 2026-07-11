@@ -331,11 +331,6 @@ export default function AdminPage() {
   };
 
   const saveNotification = async () => {
-    if (!notificationTitle.trim() || !notificationMessage.trim()) {
-      setNotificationStatus("Title and message are required.");
-      return;
-    }
-
     setNotificationLoading(true);
     setNotificationStatus("");
     try {
@@ -748,8 +743,8 @@ export default function AdminPage() {
         <p className="mt-1 text-sm text-slate-600">Create and manage the one-time popup shown to website visitors. Only one notification can be active at a time.</p>
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-3 rounded-2xl border bg-slate-50 p-4">
-            <input className="w-full rounded border px-3 py-2" placeholder="Notification title" value={notificationTitle} onChange={(event) => setNotificationTitle(event.target.value)} />
-            <textarea className="min-h-28 w-full rounded border px-3 py-2" placeholder="Notification message" value={notificationMessage} onChange={(event) => setNotificationMessage(event.target.value)} />
+            <input className="w-full rounded border px-3 py-2" placeholder="Notification title (optional)" value={notificationTitle} onChange={(event) => setNotificationTitle(event.target.value)} />
+            <textarea className="min-h-28 w-full rounded border px-3 py-2" placeholder="Notification message (optional)" value={notificationMessage} onChange={(event) => setNotificationMessage(event.target.value)} />
             <input className="w-full rounded border px-3 py-2" placeholder="Image URL (optional)" value={notificationImage} onChange={(event) => setNotificationImage(event.target.value)} />
             <label className="block text-sm font-medium text-slate-700">
               Upload image (optional)
