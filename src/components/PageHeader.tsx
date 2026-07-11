@@ -1,5 +1,5 @@
 type PageHeaderProps = {
-  title: string;
+  title: React.ReactNode;
   subtitle?: string;
   children?: React.ReactNode;
 };

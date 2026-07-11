@@ -441,11 +441,6 @@ export default function AdminPage() {
   };
 
   const handleCreateSlide = async () => {
-    if (!sliderHeadline.trim()) {
-      setSliderStatus("Headline is required.");
-      return;
-    }
-
     setSliderLoading(true);
     setSliderStatus("");
 
@@ -812,7 +807,7 @@ export default function AdminPage() {
             <div className="mt-4 space-y-3">
               <input
                 className="w-full rounded border px-3 py-2"
-                placeholder="Headline"
+                placeholder="Headline (optional)"
                 value={sliderHeadline}
                 onChange={(e) => setSliderHeadline(e.target.value)}
               />

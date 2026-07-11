@@ -70,11 +70,13 @@ export function HomeSlider() {
         )}
 
         {/* Overlay Content */}
-        {activeSlide.headline && (
+        {(activeSlide.headline || activeSlide.actionLink) && (
           <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center">
-            <h1 className="text-3xl md:text-5xl font-bold text-white text-center px-4 mb-4">
-              {activeSlide.headline}
-            </h1>
+            {activeSlide.headline && (
+              <h1 className="text-3xl md:text-5xl font-bold text-white text-center px-4 mb-4">
+                {activeSlide.headline}
+              </h1>
+            )}
             {activeSlide.actionLink && (
               <a
                 href={activeSlide.actionLink}

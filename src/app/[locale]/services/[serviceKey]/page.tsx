@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
@@ -165,7 +166,18 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   return (
     <>
-      <PageHeader title={t("title")} subtitle={servicesT("subtitle")}>
+      <PageHeader
+        title={
+          <Image
+            src="/images/service-title-logo.jpeg"
+            alt={t("title")}
+            width={150}
+            height={150}
+            priority
+          />
+        }
+        subtitle={servicesT("subtitle")}
+      >
         <PrintButton />
       </PageHeader>
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
