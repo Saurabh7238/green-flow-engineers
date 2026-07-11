@@ -8,10 +8,35 @@ export function ContactForm() {
   const t = useTranslations("contact.form");
   const tItems = useTranslations("services.items");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      const response = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          service: formData.get("service"),
+          message: formData.get("message"),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || "Unable to submit enquiry");
+      setSubmitted(true);
+    } catch (submissionError) {
+      setError(submissionError instanceof Error ? submissionError.message : "Unable to submit enquiry");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -100,10 +125,12 @@ export function ContactForm() {
       </div>
       <button
         type="submit"
+        disabled={submitting}
         className="w-full rounded-lg bg-brand-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-green-dark sm:w-auto sm:px-8"
       >
-        {t("submit")}
+        {submitting ? "Sending..." : t("submit")}
       </button>
+      {error ? <p role="alert" className="text-sm text-red-600">{error}</p> : null}
     </form>
   );
 }
