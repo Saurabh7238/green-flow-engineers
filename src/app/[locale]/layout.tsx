@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { NotificationPopup } from "@/components/NotificationPopup";
 
 type Props = {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
+      <NotificationPopup />
     </NextIntlClientProvider>
   );
 }

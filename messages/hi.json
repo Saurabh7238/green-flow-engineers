@@ -92,6 +92,23 @@
       "complete-hvac-system": { "title": "कम्प्लीट एचवीएसी सिस्टम", "description": "आपकी सुविधा के लिए डिज़ाइन किए गए संपूर्ण हीटिंग, वेंटिलेशन और एयर-कंडीशनिंग सिस्टम।" },
       "ventilation-exhaust-system": { "title": "वेंटिलेशन और एग्जॉस्ट सिस्टम", "description": "सुरक्षित और स्वस्थ औद्योगिक स्थानों के लिए विश्वसनीय ताजी हवा और निकास समाधान।" }
     },
+    "textileSystems": {
+      "spinning-unit-equipment": { "title": "स्पिनिंग यूनिट उपकरण", "description": "स्पिनिंग उपकरण और उत्पादन लाइनों की स्थापना व कमीशनिंग सहायता।" },
+      "weaving-machinery-looms": { "title": "वीविंग मशीनरी / लूम्स", "description": "वीविंग मशीनरी और लूम सिस्टम की विश्वसनीय स्थापना व कमीशनिंग।" },
+      "processing-finishing-units": { "title": "प्रोसेसिंग और फिनिशिंग यूनिट", "description": "टेक्सटाइल प्रोसेसिंग और फिनिशिंग यूनिट की एंड-टू-एंड स्थापना सहायता।" }
+    },
+    "fireSystems": {
+      "fire-detection-alarm-systems-addressable-vesda": { "title": "अग्नि पहचान और अलार्म सिस्टम", "description": "तेज और विश्वसनीय प्रतिक्रिया के लिए एड्रेसेबल और VESDA अग्नि पहचान प्रणाली।" },
+      "water-based-suppression-hydrants-sprinklers": { "title": "जल-आधारित अग्नि दमन", "description": "पूरी सुविधा की विश्वसनीय सुरक्षा के लिए हाइड्रेंट और स्प्रिंकलर सिस्टम।" },
+      "gas-based-clean-agent-suppression-co2-fm-200-novec": { "title": "गैस-आधारित क्लीन एजेंट दमन", "description": "संवेदनशील उपकरण क्षेत्रों के लिए CO2, FM-200 और Novec दमन प्रणाली।" },
+      "foam-passive-fireproofing-containment": { "title": "फोम, फायरप्रूफिंग और कंटेनमेंट", "description": "उच्च-जोखिम वाले औद्योगिक क्षेत्रों के लिए फोम सिस्टम और निष्क्रिय अग्नि सुरक्षा।" }
+    },
+    "lightingSystems": {
+      "industrial-factory-floor-high-bay-lighting": { "title": "औद्योगिक फैक्ट्री फ्लोर / हाई बे लाइटिंग", "description": "फैक्ट्री फ्लोर, गोदाम और हाई-बे स्थानों के लिए उच्च-आउटपुट, ऊर्जा-कुशल प्रकाश व्यवस्था।" },
+      "commercial-office-recessed-linear-lighting": { "title": "वाणिज्यिक कार्यालय रिसेस्ड और लीनियर लाइटिंग", "description": "वाणिज्यिक इंटीरियर के लिए कुशल रिसेस्ड और लीनियर लाइटिंग सिस्टम।" },
+      "explosion-proof-hazardous-zone-lighting": { "title": "विस्फोट-रोधी / खतरनाक क्षेत्र लाइटिंग", "description": "खतरनाक और विस्फोट-प्रवण कार्य क्षेत्रों के लिए प्रमाणित लाइटिंग समाधान।" },
+      "intelligent-lighting-control-systems-dali": { "title": "इंटेलिजेंट लाइटिंग कंट्रोल सिस्टम", "description": "स्वचालित, लचीले और ऊर्जा-बचत संचालन के लिए DALI-आधारित लाइटिंग नियंत्रण।" }
+    },
     "items": {
       "water": {
         "title": "डब्ल्यूटीपी / एसटीपी / ईटीपी और औद्योगिक आरओ सिस्टम",

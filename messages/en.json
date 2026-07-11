@@ -92,6 +92,23 @@
       "complete-hvac-system": { "title": "Complete HVAC System", "description": "End-to-end heating, ventilation, and air-conditioning systems designed for your facility." },
       "ventilation-exhaust-system": { "title": "Ventilation & Exhaust System", "description": "Reliable fresh-air and exhaust solutions for safer, healthier industrial spaces." }
     },
+    "textileSystems": {
+      "spinning-unit-equipment": { "title": "Spinning Unit Equipment", "description": "Installation and commissioning support for spinning equipment and production lines." },
+      "weaving-machinery-looms": { "title": "Weaving Machinery / Looms", "description": "Reliable setup and commissioning of weaving machinery and loom systems." },
+      "processing-finishing-units": { "title": "Processing & Finishing Units", "description": "End-to-end installation support for textile processing and finishing units." }
+    },
+    "fireSystems": {
+      "fire-detection-alarm-systems-addressable-vesda": { "title": "Fire Detection & Alarm Systems", "description": "Addressable and VESDA fire detection systems for rapid, reliable incident response." },
+      "water-based-suppression-hydrants-sprinklers": { "title": "Water-Based Suppression", "description": "Hydrant and sprinkler systems designed for dependable facility-wide protection." },
+      "gas-based-clean-agent-suppression-co2-fm-200-novec": { "title": "Gas-Based Clean Agent Suppression", "description": "CO2, FM-200, and Novec suppression systems for sensitive equipment areas." },
+      "foam-passive-fireproofing-containment": { "title": "Foam, Fireproofing & Containment", "description": "Foam systems and passive fire protection for higher-risk industrial zones." }
+    },
+    "lightingSystems": {
+      "industrial-factory-floor-high-bay-lighting": { "title": "Industrial Factory Floor / High Bay Lighting", "description": "High-output, energy-efficient lighting for factory floors, warehouses, and high-bay spaces." },
+      "commercial-office-recessed-linear-lighting": { "title": "Commercial Office Recessed & Linear Lighting", "description": "Efficient recessed and linear lighting systems for commercial interiors." },
+      "explosion-proof-hazardous-zone-lighting": { "title": "Explosion-Proof / Hazardous Zone Lighting", "description": "Certified lighting solutions for hazardous and explosion-prone work areas." },
+      "intelligent-lighting-control-systems-dali": { "title": "Intelligent Lighting Control Systems", "description": "DALI-based lighting controls for automated, flexible, energy-saving operation." }
+    },
     "items": {
       "water": {
         "title": "WTP / STP / ETP & Industrial RO Systems",

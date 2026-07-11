@@ -36,6 +36,26 @@ const hvacSystemOptions = [
   "ventilation-exhaust-system",
 ] as const;
 
+const textileMachineryOptions = [
+  "spinning-unit-equipment",
+  "weaving-machinery-looms",
+  "processing-finishing-units",
+] as const;
+
+const fireSystemOptions = [
+  "fire-detection-alarm-systems-addressable-vesda",
+  "water-based-suppression-hydrants-sprinklers",
+  "gas-based-clean-agent-suppression-co2-fm-200-novec",
+  "foam-passive-fireproofing-containment",
+] as const;
+
+const lightingSystemOptions = [
+  "industrial-factory-floor-high-bay-lighting",
+  "commercial-office-recessed-linear-lighting",
+  "explosion-proof-hazardous-zone-lighting",
+  "intelligent-lighting-control-systems-dali",
+] as const;
+
 const fallbackRackItems = [
   "Slotted Angle Rack",
   "Multi-Tier Racking System",
@@ -92,6 +112,8 @@ export default async function ServiceDetailPage({ params }: Props) {
   const isRackService = serviceKey === "racks";
   const isHvacService = serviceKey === "hvac";
   const isTextileService = serviceKey === "textile";
+  const isFireService = serviceKey === "fire";
+  const isLightingService = serviceKey === "lighting";
   const rackTypes = (isRackService ? (t.raw("rackTypes") as string[] | undefined) : undefined) ?? [];
   const textileMachineryTypes = (isTextileService ? (t.raw("machineryTypes") as string[] | undefined) : undefined) ?? [];
   const allServiceContents = await getAllServiceContent(locale);
@@ -154,19 +176,29 @@ export default async function ServiceDetailPage({ params }: Props) {
           ← {servicesT("title")}
         </Link>
 
-        {isWaterService || isRackService || isHvacService ? (
+        {isWaterService || isRackService || isHvacService || isTextileService || isFireService || isLightingService ? (
           <div className="grid gap-6 md:grid-cols-2">
-            {(isWaterService ? waterPlantOptions : isRackService ? rackSystemOptions : hvacSystemOptions).map((optionKey) => (
+            {(isWaterService
+              ? waterPlantOptions
+              : isRackService
+                ? rackSystemOptions
+                : isHvacService
+                  ? hvacSystemOptions
+                  : isTextileService
+                    ? textileMachineryOptions
+                    : isFireService
+                      ? fireSystemOptions
+                      : lightingSystemOptions).map((optionKey) => (
               <Link
                 key={optionKey}
                 href={`/${locale}/services/${serviceKey}/${optionKey}`}
                 className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-brand-green/40 hover:shadow-md"
               >
                 <h2 className="text-xl font-semibold text-slate-900">
-                  {servicesT(`${isWaterService ? "waterPlants" : isRackService ? "rackSystems" : "hvacSystems"}.${optionKey}.title`)}
+                  {servicesT(`${isWaterService ? "waterPlants" : isRackService ? "rackSystems" : isHvacService ? "hvacSystems" : isTextileService ? "textileSystems" : isFireService ? "fireSystems" : "lightingSystems"}.${optionKey}.title`)}
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                  {servicesT(`${isWaterService ? "waterPlants" : isRackService ? "rackSystems" : "hvacSystems"}.${optionKey}.description`)}
+                  {servicesT(`${isWaterService ? "waterPlants" : isRackService ? "rackSystems" : isHvacService ? "hvacSystems" : isTextileService ? "textileSystems" : isFireService ? "fireSystems" : "lightingSystems"}.${optionKey}.description`)}
                 </p>
                 <span className="mt-5 inline-flex text-sm font-semibold text-brand-green">
                   View projects →

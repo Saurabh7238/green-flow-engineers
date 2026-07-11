@@ -36,6 +36,26 @@ const hvacSystemOptions = [
   "ventilation-exhaust-system",
 ] as const;
 
+const textileMachineryOptions = [
+  "spinning-unit-equipment",
+  "weaving-machinery-looms",
+  "processing-finishing-units",
+] as const;
+
+const fireSystemOptions = [
+  "fire-detection-alarm-systems-addressable-vesda",
+  "water-based-suppression-hydrants-sprinklers",
+  "gas-based-clean-agent-suppression-co2-fm-200-novec",
+  "foam-passive-fireproofing-containment",
+] as const;
+
+const lightingSystemOptions = [
+  "industrial-factory-floor-high-bay-lighting",
+  "commercial-office-recessed-linear-lighting",
+  "explosion-proof-hazardous-zone-lighting",
+  "intelligent-lighting-control-systems-dali",
+] as const;
+
 const fallbackRackItems = [
   "Slotted Angle Rack",
   "Multi-Tier Racking System",
@@ -80,11 +100,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: t("title"), description: t("description") };
   }
 
-  if (serviceKey === "racks" || serviceKey === "hvac") {
-    const options = serviceKey === "racks" ? rackSystemOptions : hvacSystemOptions;
-    const namespace = serviceKey === "racks" ? "rackSystems" : "hvacSystems";
+  if (serviceKey === "racks" || serviceKey === "hvac" || serviceKey === "textile" || serviceKey === "fire" || serviceKey === "lighting") {
+    const options = serviceKey === "racks" ? rackSystemOptions : serviceKey === "hvac" ? hvacSystemOptions : serviceKey === "textile" ? textileMachineryOptions : serviceKey === "fire" ? fireSystemOptions : lightingSystemOptions;
+    const namespace = serviceKey === "racks" ? "rackSystems" : serviceKey === "hvac" ? "hvacSystems" : serviceKey === "textile" ? "textileSystems" : serviceKey === "fire" ? "fireSystems" : "lightingSystems";
     if (!options.some((option) => option === slug)) {
-      return { title: serviceKey === "racks" ? "Storage Rack" : "HVAC System" };
+      return { title: serviceKey === "racks" ? "Storage Rack" : serviceKey === "hvac" ? "HVAC System" : serviceKey === "textile" ? "Textile Machinery" : serviceKey === "fire" ? "Fire Fighting System" : "Industrial & Commercial Lighting" };
     }
     const t = await getTranslations({ locale, namespace: `services.${namespace}.${slug}` });
     return { title: t("title"), description: t("description") };
@@ -178,9 +198,9 @@ export default async function ServiceSlugPage({ params }: Props) {
     );
   }
 
-  if (serviceKey === "racks" || serviceKey === "hvac") {
-    const options = serviceKey === "racks" ? rackSystemOptions : hvacSystemOptions;
-    const namespace = serviceKey === "racks" ? "rackSystems" : "hvacSystems";
+  if (serviceKey === "racks" || serviceKey === "hvac" || serviceKey === "textile" || serviceKey === "fire" || serviceKey === "lighting") {
+    const options = serviceKey === "racks" ? rackSystemOptions : serviceKey === "hvac" ? hvacSystemOptions : serviceKey === "textile" ? textileMachineryOptions : serviceKey === "fire" ? fireSystemOptions : lightingSystemOptions;
+    const namespace = serviceKey === "racks" ? "rackSystems" : serviceKey === "hvac" ? "hvacSystems" : serviceKey === "textile" ? "textileSystems" : serviceKey === "fire" ? "fireSystems" : "lightingSystems";
     if (!options.some((option) => option === slug)) {
       notFound();
     }

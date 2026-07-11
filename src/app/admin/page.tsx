@@ -22,6 +22,7 @@ type Section = { id: string; label: string; items: SectionItem[] };
 type ServiceContent = { serviceKey: ServiceKey; locale: string; variant?: string; title: string; description: string; imageUrl?: string; items: ServiceContentItem[]; sections?: Section[] };
 type SliderItem = { id: string; sequence: number; mediaType: "image" | "video"; assetUrl: string; headline?: string; actionLink?: string; boundaryClass?: string; aspect?: string };
 type CustomerQuote = { id: string; quote: string; author: string; designation?: string };
+type AdminNotification = { id: string; title: string; message: string; image?: string; file?: string; active: boolean; expiresAt?: string | null };
 
 const SUBTYPE_MAP: Record<string, string[]> = {
   water: ["Water Treatment Plant (WTP)", "Sewage Treatment Plant (STP)", "Effluent Treatment Plant (ETP)", "Industrial RO System"],
@@ -127,6 +128,18 @@ export default function AdminPage() {
   const [quoteDesignation, setQuoteDesignation] = useState("");
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteStatus, setQuoteStatus] = useState("");
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
+  const [notificationId, setNotificationId] = useState<string | null>(null);
+  const [notificationTitle, setNotificationTitle] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+  const [notificationImage, setNotificationImage] = useState("");
+  const [notificationFile, setNotificationFile] = useState("");
+  const [notificationImageFile, setNotificationImageFile] = useState<File | null>(null);
+  const [notificationAttachment, setNotificationAttachment] = useState<File | null>(null);
+  const [notificationActive, setNotificationActive] = useState(true);
+  const [notificationExpiresAt, setNotificationExpiresAt] = useState("");
+  const [notificationLoading, setNotificationLoading] = useState(false);
+  const [notificationStatus, setNotificationStatus] = useState("");
 
   useEffect(() => {
     const user = typeof window !== "undefined" && localStorage.getItem("greenflow-current-user");
@@ -148,6 +161,7 @@ export default function AdminPage() {
     loadContent();
     loadSlides();
     loadQuotes();
+    loadNotifications();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authorized]);
 
@@ -256,6 +270,102 @@ export default function AdminPage() {
       if (response.ok && data.success) setQuotes(data.data || []);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const loadNotifications = async () => {
+    try {
+      const response = await fetch("/api/notifications");
+      const data = await response.json();
+      if (response.ok && data.success) setNotifications(data.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const resetNotificationForm = () => {
+    setNotificationId(null);
+    setNotificationTitle("");
+    setNotificationMessage("");
+    setNotificationImage("");
+    setNotificationFile("");
+    setNotificationImageFile(null);
+    setNotificationAttachment(null);
+    setNotificationActive(true);
+    setNotificationExpiresAt("");
+  };
+
+  const uploadNotificationFile = async (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    const response = await fetch("/api/upload-file", { method: "POST", body: form });
+    return (await response.json()) as { success?: boolean; url?: string; error?: string };
+  };
+
+  const saveNotification = async () => {
+    if (!notificationTitle.trim() || !notificationMessage.trim()) {
+      setNotificationStatus("Title and message are required.");
+      return;
+    }
+
+    setNotificationLoading(true);
+    setNotificationStatus("");
+    try {
+      let image = notificationImage.trim();
+      let file = notificationFile.trim();
+      if (notificationImageFile) {
+        const upload = await uploadImage(notificationImageFile);
+        if (!upload?.success || !upload.url) throw new Error(upload?.error || "Image upload failed.");
+        image = upload.url;
+      }
+      if (notificationAttachment) {
+        const upload = await uploadNotificationFile(notificationAttachment);
+        if (!upload.success || !upload.url) throw new Error(upload.error || "File upload failed.");
+        file = upload.url;
+      }
+
+      const response = await fetch("/api/notifications", {
+        method: notificationId ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        // End of the selected local date makes “show until” inclusive for admins.
+        body: JSON.stringify({ id: notificationId || undefined, title: notificationTitle, message: notificationMessage, image, file, active: notificationActive, expiresAt: notificationExpiresAt ? new Date(`${notificationExpiresAt}T23:59:59.999`).toISOString() : null }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.error || "Failed to save notification.");
+
+      resetNotificationForm();
+      setNotificationStatus("Notification saved.");
+      await loadNotifications();
+    } catch (error) {
+      setNotificationStatus(error instanceof Error ? error.message : "Failed to save notification.");
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  const editNotification = (notification: AdminNotification) => {
+    setNotificationId(notification.id);
+    setNotificationTitle(notification.title);
+    setNotificationMessage(notification.message);
+    setNotificationImage(notification.image || "");
+    setNotificationFile(notification.file || "");
+    setNotificationImageFile(null);
+    setNotificationAttachment(null);
+    setNotificationActive(notification.active);
+    setNotificationExpiresAt(notification.expiresAt ? notification.expiresAt.slice(0, 10) : "");
+    setNotificationStatus("");
+  };
+
+  const deleteNotification = async (id: string) => {
+    if (!confirm("Delete this notification?")) return;
+    try {
+      const response = await fetch(`/api/notifications?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Failed to delete notification.");
+      if (notificationId === id) resetNotificationForm();
+      setNotificationStatus("Notification deleted.");
+      await loadNotifications();
+    } catch (error) {
+      setNotificationStatus(error instanceof Error ? error.message : "Failed to delete notification.");
     }
   };
 
@@ -604,6 +714,66 @@ export default function AdminPage() {
       </div>
 
       <p className="mt-6 text-sm text-slate-600">{status}</p>
+
+      <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-2xl font-semibold">Popup Notification Manager</h2>
+        <p className="mt-1 text-sm text-slate-600">Create and manage the one-time popup shown to website visitors. Only one notification can be active at a time.</p>
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-3 rounded-2xl border bg-slate-50 p-4">
+            <input className="w-full rounded border px-3 py-2" placeholder="Notification title" value={notificationTitle} onChange={(event) => setNotificationTitle(event.target.value)} />
+            <textarea className="min-h-28 w-full rounded border px-3 py-2" placeholder="Notification message" value={notificationMessage} onChange={(event) => setNotificationMessage(event.target.value)} />
+            <input className="w-full rounded border px-3 py-2" placeholder="Image URL (optional)" value={notificationImage} onChange={(event) => setNotificationImage(event.target.value)} />
+            <label className="block text-sm font-medium text-slate-700">
+              Upload image (optional)
+              <input type="file" accept="image/*" className="mt-1 block w-full rounded border bg-white px-3 py-2" onChange={(event) => setNotificationImageFile(event.target.files?.[0] || null)} />
+            </label>
+            <input className="w-full rounded border px-3 py-2" placeholder="Download file URL (optional)" value={notificationFile} onChange={(event) => setNotificationFile(event.target.value)} />
+            <label className="block text-sm font-medium text-slate-700">
+              Upload download file (optional, max 10 MB)
+              <input type="file" className="mt-1 block w-full rounded border bg-white px-3 py-2" onChange={(event) => setNotificationAttachment(event.target.files?.[0] || null)} />
+            </label>
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <input type="checkbox" checked={notificationActive} onChange={(event) => setNotificationActive(event.target.checked)} />
+              Active — show this popup to visitors
+            </label>
+            <label className="block text-sm font-medium text-slate-700">
+              Show until (optional)
+              <input type="date" className="mt-1 block w-full rounded border bg-white px-3 py-2" value={notificationExpiresAt} onChange={(event) => setNotificationExpiresAt(event.target.value)} />
+              <span className="mt-1 block text-xs font-normal text-slate-500">The notification remains active through the end of this date.</span>
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={saveNotification} disabled={notificationLoading} className="rounded bg-brand-green px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60">
+                {notificationLoading ? "Saving..." : notificationId ? "Update notification" : "Create notification"}
+              </button>
+              {notificationId ? <button type="button" onClick={resetNotificationForm} className="rounded bg-slate-200 px-4 py-2 font-semibold text-slate-800">Cancel edit</button> : null}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border bg-slate-50 p-4">
+            <h3 className="font-semibold">Saved Notifications</h3>
+            <div className="mt-4 space-y-3">
+              {notifications.length === 0 ? <p className="text-sm text-slate-600">No notifications created yet.</p> : null}
+              {notifications.map((notification) => (
+                <div key={notification.id} className="rounded-lg border bg-white p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-semibold">{notification.title}</p>
+                    <span className={`rounded-full px-2 py-1 text-xs font-semibold ${notification.active ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"}`}>
+                      {notification.active ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-sm text-slate-600">{notification.message}</p>
+                  {notification.expiresAt ? <p className="mt-2 text-xs text-slate-500">Expires: {new Date(notification.expiresAt).toLocaleDateString()}</p> : <p className="mt-2 text-xs text-slate-500">No expiry date</p>}
+                  <div className="mt-3 flex gap-2">
+                    <button type="button" onClick={() => editNotification(notification)} className="rounded bg-slate-200 px-3 py-1 text-sm text-slate-800">Edit</button>
+                    <button type="button" onClick={() => deleteNotification(notification.id)} className="rounded bg-red-100 px-3 py-1 text-sm text-red-700">Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <p className="mt-4 text-sm text-slate-600">{notificationStatus}</p>
+      </div>
 
       <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
