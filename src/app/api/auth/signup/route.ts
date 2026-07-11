@@ -1,7 +1,48 @@
 import { NextResponse } from "next/server";
 import { createUser } from "@/lib/auth";
 
+const SIGNUP_LIMIT = 5;
+const SIGNUP_WINDOW_MS = 15 * 60 * 1000;
+const signupAttempts = new Map<string, number[]>();
+
+function getClientIp(request: Request) {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    ?? request.headers.get("x-real-ip")
+    ?? "unknown";
+}
+
+function checkSignupRateLimit(ip: string) {
+  const now = Date.now();
+  const windowStart = now - SIGNUP_WINDOW_MS;
+  const recentAttempts = (signupAttempts.get(ip) ?? []).filter((attempt) => attempt > windowStart);
+
+  if (recentAttempts.length >= SIGNUP_LIMIT) {
+    signupAttempts.set(ip, recentAttempts);
+    return { allowed: false, retryAfter: Math.ceil((recentAttempts[0] + SIGNUP_WINDOW_MS - now) / 1000) };
+  }
+
+  recentAttempts.push(now);
+  signupAttempts.set(ip, recentAttempts);
+  return { allowed: true, remaining: SIGNUP_LIMIT - recentAttempts.length };
+}
+
 export async function POST(request: Request) {
+  const rateLimit = checkSignupRateLimit(getClientIp(request));
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { message: "Too many signup attempts. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rateLimit.retryAfter),
+          "X-RateLimit-Limit": String(SIGNUP_LIMIT),
+          "X-RateLimit-Remaining": "0",
+        },
+      },
+    );
+  }
+
   try {
     const body = await request.json();
     const { name, email, mobile, password, confirmPassword } = body;
@@ -22,7 +63,15 @@ export async function POST(request: Request) {
       role: "user",
     });
 
-    return NextResponse.json({ success: true, user });
+    return NextResponse.json(
+      { success: true, user },
+      {
+        headers: {
+          "X-RateLimit-Limit": String(SIGNUP_LIMIT),
+          "X-RateLimit-Remaining": String(rateLimit.remaining),
+        },
+      },
+    );
   } catch (error) {
     // Log error server-side for debugging
     // eslint-disable-next-line no-console

@@ -1,6 +1,11 @@
+import "server-only";
 import { MongoClient } from "mongodb";
 
-const uri = process.env.MONGODB_URI || "mongodb+srv://s26719247_db_user:NvkQPt5xexENtgxm@cluster0.5lknnny.mongodb.net/";
+const uri = process.env.MONGODB_URI;
+
+if (!uri) {
+  throw new Error("MONGODB_URI is required. Add it to your server environment variables.");
+}
 
 const options = {};
 
