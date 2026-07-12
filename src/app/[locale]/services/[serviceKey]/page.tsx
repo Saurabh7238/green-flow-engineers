@@ -128,6 +128,21 @@ export default async function ServiceDetailPage({ params }: Props) {
       : (serviceGroupContents.find((content) => content.imageUrl || content.items?.some((item) => item.media_url)) ?? serviceGroupContents[0] ?? null);
   const serviceContent = serviceKey === "textile" ? null : heroContent;
   const textileContents = normalizedServiceContents.filter((content) => content.serviceKey === "textile");
+  const getSubtypeBackgroundImage = (variant: string) => {
+    const subtypeContent = serviceGroupContents.find((content) => content.variant === variant);
+    const image =
+      subtypeContent?.imageUrl ||
+      subtypeContent?.items?.find((item) => item.media_type === "image" && item.media_url)?.media_url ||
+      subtypeContent?.sections?.flatMap((section) => section.items).find((item) => item.imageUrl)?.imageUrl ||
+      serviceBackgroundImages[serviceKey as ServiceKey];
+
+    try {
+      const url = new URL(image);
+      return url.pathname.startsWith("/api/image/") ? `${url.pathname}${url.search}` : image;
+    } catch {
+      return image;
+    }
+  };
   const rackItems =
     serviceContent?.sections?.flatMap((section) => section.items).length
       ? serviceContent?.sections?.flatMap((section) => section.items) ?? []
@@ -216,7 +231,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                 className="group relative min-h-60 overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 p-8 shadow-sm transition hover:-translate-y-1 hover:border-brand-green hover:shadow-md"
               >
                 <Image
-                  src={serviceBackgroundImages[serviceKey as ServiceKey]}
+                  src={getSubtypeBackgroundImage(optionKey)}
                   alt=""
                   fill
                   className="object-cover transition duration-500 group-hover:scale-105"
