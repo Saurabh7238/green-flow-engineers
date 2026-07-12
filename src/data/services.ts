@@ -17,3 +17,12 @@ export const serviceIcons: Record<ServiceKey, string> = {
   fire: "🔥",
   lighting: "💡",
 };
+
+export const serviceBackgroundImages: Record<ServiceKey, string> = {
+  water: "/images/gallery/projects/water-treatment/ro-plant.jpg",
+  racks: "/images/gallery/machinery/storage-racks/storage-racks.jpg",
+  hvac: "/images/gallery/projects/hvac/hvac-ahu.jpg",
+  textile: "/images/gallery/machinery/textile/spinning-frame.jpg",
+  fire: "/images/gallery/projects/fire-fighting/fire-hydrant.jpg",
+  lighting: "/images/gallery/projects/lighting/led-factory.jpg",
+};

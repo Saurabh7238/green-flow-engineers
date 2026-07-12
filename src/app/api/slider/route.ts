@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { addSlide, listSlider, updateSlide, deleteSlide } from "@/lib/slider";
+import { isMongoDbConfigured } from "@/lib/mongodb";
 
 export async function GET(request: Request) {
+  if (!isMongoDbConfigured()) {
+    return NextResponse.json({ success: true, data: [] });
+  }
+
   try {
     const url = new URL(request.url);
     const sliderName = url.searchParams.get("slider") || "HOMEPAGE_HERO_SLIDER";

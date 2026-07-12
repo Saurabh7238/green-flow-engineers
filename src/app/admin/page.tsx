@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { serviceKeys, type ServiceKey } from "@/data/services";
 import { getSlotVariant } from "@/lib/content-slot";
+import { GalleryManager } from "@/components/GalleryManager";
 
 type ServiceContentItem = {
   id: string;
@@ -641,6 +642,8 @@ export default function AdminPage() {
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-bold">Admin — Service Content Manager</h1>
       <p className="mt-2 text-sm text-slate-600">Select a service vertical and subtype, then add/edit portfolio items.</p>
+
+      <GalleryManager />
 
       <div className="mt-6 flex gap-3 flex-wrap">
         {serviceKeys.map((k) => (

@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { createQuote, deleteQuote, listQuotes } from "@/lib/quotes";
+import { isMongoDbConfigured } from "@/lib/mongodb";
 
 export async function GET() {
+  if (!isMongoDbConfigured()) {
+    return NextResponse.json({ success: true, data: [] });
+  }
+
   try {
     return NextResponse.json({ success: true, data: await listQuotes() });
   } catch (error) {

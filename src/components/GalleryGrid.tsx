@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   galleryItems,
   getGalleryByType,
@@ -11,14 +11,47 @@ import {
 } from "@/data/gallery";
 
 type Filter = GalleryType | "all";
+type ManagedGalleryItem = {
+  id: string;
+  type: GalleryType;
+  image: string;
+  title: GalleryItem["title"] | string;
+  description?: GalleryItem["description"] | string;
+  location?: NonNullable<GalleryItem["location"]> | string;
+};
+
+function asLocalizedText(value: ManagedGalleryItem["title"] | ManagedGalleryItem["description"] | ManagedGalleryItem["location"]) {
+  if (typeof value === "string") return { en: value, hi: value };
+  return value || { en: "", hi: "" };
+}
 
 export function GalleryGrid({ showFilter = true }: { showFilter?: boolean }) {
   const locale = useLocale() as "en" | "hi";
   const t = useTranslations("gallery");
   const [filter, setFilter] = useState<Filter>("all");
   const [lightbox, setLightbox] = useState<GalleryItem | null>(null);
+  const [managedItems, setManagedItems] = useState<GalleryItem[]>([]);
 
-  const items = showFilter ? getGalleryByType(filter) : galleryItems;
+  useEffect(() => {
+    fetch("/api/gallery")
+      .then((response) => (response.ok ? response.json() : Promise.reject(new Error("Failed to load gallery"))))
+      .then((data) => {
+        const savedItems = Array.isArray(data.data) ? data.data as ManagedGalleryItem[] : [];
+        setManagedItems(savedItems.map((item) => ({
+          id: `managed-${item.id}`,
+          type: item.type,
+          image: item.image,
+          title: asLocalizedText(item.title),
+          description: asLocalizedText(item.description),
+          location: item.location ? asLocalizedText(item.location) : undefined,
+          featured: false,
+        })));
+      })
+      .catch(() => setManagedItems([]));
+  }, []);
+
+  const allItems = [...galleryItems, ...managedItems];
+  const items = showFilter ? allItems.filter((item) => filter === "all" || item.type === filter) : allItems;
 
   const filters: { key: Filter; label: string }[] = [
     { key: "all", label: t("all") },

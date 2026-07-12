@@ -1,25 +1,28 @@
 import "server-only";
 import { MongoClient } from "mongodb";
-
-const uri = process.env.MONGODB_URI;
-
-if (!uri) {
-  throw new Error("MONGODB_URI is required. Add it to your server environment variables.");
-}
+import { connection } from "next/server";
 
 const options = {};
 
-let client: MongoClient | undefined;
-let clientPromise: Promise<MongoClient>;
+export function isMongoDbConfigured() {
+  return Boolean(process.env.MONGODB_URI);
+}
 
-if (!globalThis.__mongoClientPromise) {
-  client = new MongoClient(uri, options);
+function getClientPromise() {
+  const uri = process.env.MONGODB_URI;
+
+  if (!uri) {
+    throw new Error("MONGODB_URI is required. Add it to your server environment variables.");
+  }
+
+  if (!globalThis.__mongoClientPromise) {
+    const client = new MongoClient(uri, options);
   // Create a connect promise that may attempt an optional insecure TLS fallback
   // if the initial connection fails and the environment allows it.
   // eslint-disable-next-line no-console
   globalThis.__mongoClientPromise = (async () => {
     try {
-      return await client!.connect();
+      return await client.connect();
     } catch (err) {
       console.error("MongoDB initial connect error:", err);
 
@@ -33,15 +36,19 @@ if (!globalThis.__mongoClientPromise) {
       throw err;
     }
   })();
+  }
+
+  return globalThis.__mongoClientPromise as Promise<MongoClient>;
 }
 
-clientPromise = globalThis.__mongoClientPromise as Promise<MongoClient>;
-
 export async function getMongoClient() {
-  return clientPromise;
+  return getClientPromise();
 }
 
 export async function getDb() {
+  // Database-backed pages must wait for a request. Otherwise Next.js tries to
+  // authenticate with MongoDB while prerendering pages during `next build`.
+  await connection();
   const client = await getMongoClient();
   return client.db("greenflow");
 }

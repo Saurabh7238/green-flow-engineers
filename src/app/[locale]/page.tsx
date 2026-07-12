@@ -7,7 +7,6 @@ import { HomeSlider } from "@/components/HomeSlider";
 import { QuotesSection } from "@/components/QuotesSection";
 import { serviceKeys } from "@/data/services";
 import { blogPosts } from "@/data/blog";
-import { getSiteContent } from "@/lib/site-content";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -25,13 +24,11 @@ export default async function HomePage({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations("home");
-  const tMeta = await getTranslations("meta");
   const tCta = await getTranslations("cta");
   const tNav = await getTranslations("nav");
   const tCat = await getTranslations("categories");
   const tAbout = await getTranslations("about");
   const loc = locale as "en" | "hi";
-  const dbContent = await getSiteContent();
   const coreValues = tAbout.raw("coreValues") as string[];
 
   const featuredPosts = blogPosts.slice(0, 3);
