@@ -10,6 +10,18 @@ import { blogPosts } from "@/data/blog";
 
 type Props = { params: Promise<{ locale: string }> };
 
+const coreValueColorClasses = [
+  "border-emerald-200 bg-emerald-50 text-emerald-950",
+  "border-sky-200 bg-sky-50 text-sky-950",
+  "border-amber-200 bg-amber-50 text-amber-950",
+  "border-rose-200 bg-rose-50 text-rose-950",
+  "border-violet-200 bg-violet-50 text-violet-950",
+  "border-cyan-200 bg-cyan-50 text-cyan-950",
+  "border-lime-200 bg-lime-50 text-lime-950",
+  "border-orange-200 bg-orange-50 text-orange-950",
+  "border-indigo-200 bg-indigo-50 text-indigo-950",
+];
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
@@ -99,8 +111,11 @@ export default async function HomePage({ params }: Props) {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="text-2xl font-bold text-slate-900">{tAbout("coreValuesTitle")}</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {coreValues.map((value) => (
-              <div key={value} className="rounded-xl border border-slate-200 bg-white p-5 font-semibold text-slate-800 shadow-sm">
+            {coreValues.map((value, index) => (
+              <div
+                key={value}
+                className={`rounded-xl border p-5 font-semibold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${coreValueColorClasses[index % coreValueColorClasses.length]}`}
+              >
                 <span className="mr-2 text-brand-green" aria-hidden>✓</span>
                 {value}
               </div>

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { PrintButton } from "@/components/PrintButton";
-import { serviceKeys, type ServiceKey } from "@/data/services";
+import { serviceBackgroundImages, serviceKeys, type ServiceKey } from "@/data/services";
 import { getServiceContent, getAllServiceContent, getSlotVariant } from "@/lib/service-content";
 
 type Props = {
@@ -133,6 +133,12 @@ export default async function ServiceDetailPage({ params }: Props) {
       ? serviceContent?.sections?.flatMap((section) => section.items) ?? []
       : fallbackRackItems;
 
+  const getItemDescription = (item: {
+    description?: string;
+    description_short?: string;
+    description_detailed?: string;
+  }) => item.description_detailed || item.description || item.description_short || "";
+
   const contentSections = (() => {
     if (!serviceGroupContents.length) return [];
 
@@ -168,15 +174,18 @@ export default async function ServiceDetailPage({ params }: Props) {
     <>
       <PageHeader
         title={
-          <Image
-            src="/images/service-title-logo.jpeg"
-            alt={t("title")}
-            width={150}
-            height={150}
-            priority
-          />
+          <div className="flex items-center gap-4">
+            <Image
+              src="/images/service-title-logo.jpeg"
+              alt=""
+              width={72}
+              height={72}
+              className="h-14 w-14 rounded-xl object-cover sm:h-[72px] sm:w-[72px]"
+            />
+            <span>{t("title")}</span>
+          </div>
         }
-        subtitle={servicesT("subtitle")}
+        subtitle={t("description")}
       >
         <PrintButton />
       </PageHeader>
@@ -204,17 +213,27 @@ export default async function ServiceDetailPage({ params }: Props) {
               <Link
                 key={optionKey}
                 href={`/${locale}/services/${serviceKey}/${optionKey}`}
-                className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:border-brand-green/40 hover:shadow-md"
+                className="group relative min-h-60 overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 p-8 shadow-sm transition hover:-translate-y-1 hover:border-brand-green hover:shadow-md"
               >
-                <h2 className="text-xl font-semibold text-slate-900">
+                <Image
+                  src={serviceBackgroundImages[serviceKey as ServiceKey]}
+                  alt=""
+                  fill
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-slate-950/75 to-emerald-950/60" />
+                <div className="relative z-10">
+                <h2 className="text-xl font-semibold text-white">
                   {servicesT(`${isWaterService ? "waterPlants" : isRackService ? "rackSystems" : isHvacService ? "hvacSystems" : isTextileService ? "textileSystems" : isFireService ? "fireSystems" : "lightingSystems"}.${optionKey}.title`)}
                 </h2>
-                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                <p className="mt-3 text-sm leading-relaxed text-slate-100">
                   {servicesT(`${isWaterService ? "waterPlants" : isRackService ? "rackSystems" : isHvacService ? "hvacSystems" : isTextileService ? "textileSystems" : isFireService ? "fireSystems" : "lightingSystems"}.${optionKey}.description`)}
                 </p>
-                <span className="mt-5 inline-flex text-sm font-semibold text-brand-green">
+                <span className="mt-5 inline-flex text-sm font-semibold text-emerald-300">
                   View projects →
                 </span>
+                </div>
               </Link>
             ))}
           </div>
@@ -271,9 +290,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                             </div>
                           ) : null}
                           <h4 className="text-sm font-semibold text-slate-900">{item.title}</h4>
-                          <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                            {'description' in item ? item.description : item.description_short}
-                          </p>
+                          <p className="mt-2 text-sm leading-relaxed text-slate-600">{getItemDescription(item)}</p>
                         </div>
                       ))}
                     </div>

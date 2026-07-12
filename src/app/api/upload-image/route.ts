@@ -37,9 +37,9 @@ export async function POST(request: Request) {
     });
 
     const fileId = uploadStream.id as ObjectId;
-    const requestOrigin = request.headers.get("origin") || request.headers.get("x-forwarded-proto") || "http://localhost:3000";
-    const baseUrl = requestOrigin.includes("http") ? requestOrigin : `https://${requestOrigin}`;
-    const publicUrl = new URL(`/api/image/${fileId.toString()}`, baseUrl).toString();
+    // Store a same-site path so it works in every deployment environment and can
+    // be safely rendered by Next's Image component without remote host config.
+    const publicUrl = `/api/image/${fileId.toString()}`;
 
     return NextResponse.json({ success: true, url: publicUrl, id: fileId.toString() });
   } catch (error) {

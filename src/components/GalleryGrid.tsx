@@ -25,6 +25,15 @@ function asLocalizedText(value: ManagedGalleryItem["title"] | ManagedGalleryItem
   return value || { en: "", hi: "" };
 }
 
+function normalizeGalleryImageUrl(image: string) {
+  try {
+    const url = new URL(image);
+    return url.pathname.startsWith("/api/image/") ? `${url.pathname}${url.search}` : image;
+  } catch {
+    return image;
+  }
+}
+
 export function GalleryGrid({ showFilter = true }: { showFilter?: boolean }) {
   const locale = useLocale() as "en" | "hi";
   const t = useTranslations("gallery");
@@ -40,7 +49,7 @@ export function GalleryGrid({ showFilter = true }: { showFilter?: boolean }) {
         setManagedItems(savedItems.map((item) => ({
           id: `managed-${item.id}`,
           type: item.type,
-          image: item.image,
+          image: normalizeGalleryImageUrl(item.image),
           title: asLocalizedText(item.title),
           description: asLocalizedText(item.description),
           location: item.location ? asLocalizedText(item.location) : undefined,

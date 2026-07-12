@@ -27,7 +27,7 @@ export default async function ServicesPage({ params }: Props) {
         <p className="no-print mb-8 text-sm text-slate-500">{t("brochureNote")}</p>
         <div className="grid gap-6 sm:grid-cols-2">
           {serviceKeys.map((key) => (
-            <ServiceCard key={key} serviceKey={key} />
+            <ServiceCard key={key} serviceKey={key} compact />
           ))}
         </div>
       </div>

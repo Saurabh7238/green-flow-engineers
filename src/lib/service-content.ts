@@ -128,7 +128,7 @@ export function sanitizeServiceContentItem(
       : defaultServiceKey,
     subtype: item.subtype?.toString().trim() || defaultSubtype,
     title: item.title?.toString().trim() || "",
-    description_short: item.description_short?.toString().trim().slice(0, 160) || "",
+    description_short: item.description_short?.toString().trim() || "",
     description_detailed: item.description_detailed?.toString().trim() || "",
     media_type: item.media_type === "video" ? "video" : "image",
     media_url: item.media_url?.toString().trim() || "",

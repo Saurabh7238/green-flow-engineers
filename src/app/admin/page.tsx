@@ -553,7 +553,7 @@ export default function AdminPage() {
       vertical_tab: serviceKey,
       subtype,
       title: payload.title.trim(),
-      description_short: payload.short.trim().slice(0, 160),
+      description_short: payload.short.trim(),
       description_detailed: payload.detailed?.trim() || "",
       media_type: payload.mediaType,
       media_url: mediaUrl,

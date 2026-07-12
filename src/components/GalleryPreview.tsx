@@ -6,6 +6,15 @@ import { listGalleryItems } from "@/lib/gallery-content";
 
 type Props = { locale: string };
 
+function normalizeGalleryImageUrl(image: string) {
+  try {
+    const url = new URL(image);
+    return url.pathname.startsWith("/api/image/") ? `${url.pathname}${url.search}` : image;
+  } catch {
+    return image;
+  }
+}
+
 export async function GalleryPreview({ locale }: Props) {
   const t = await getTranslations("gallery");
   const loc = locale as "en" | "hi";
@@ -19,7 +28,7 @@ export async function GalleryPreview({ locale }: Props) {
       .map((item) => ({
         id: `managed-${item.id}`,
         type: item.type,
-        image: item.image,
+        image: normalizeGalleryImageUrl(item.image),
         title: item.title,
         description: item.description,
         location: item.location,
