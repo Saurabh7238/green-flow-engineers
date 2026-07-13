@@ -121,6 +121,7 @@ export default function AdminPage() {
   const [sliderHeadline, setSliderHeadline] = useState("");
   const [sliderActionLink, setSliderActionLink] = useState("");
   const [sliderMediaType, setSliderMediaType] = useState<"image" | "video">("image");
+  const [sliderVideoSource, setSliderVideoSource] = useState<"link" | "gallery">("link");
   const [sliderAssetUrl, setSliderAssetUrl] = useState("");
   const [sliderFile, setSliderFile] = useState<File | null>(null);
   const [sliderPreviewUrl, setSliderPreviewUrl] = useState<string>("");
@@ -250,6 +251,23 @@ export default function AdminPage() {
       return { success: false, error: errorMessage };
     }
 
+    return res.ok ? await res.json() : null;
+  };
+
+  const uploadFile = async (file: File) => {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("/api/upload-file", { method: "POST", body: form });
+    if (!res.ok) {
+      let errorMessage = "File upload failed";
+      try {
+        const data = await res.json();
+        if (data?.error) errorMessage = data.error;
+      } catch {
+        // Ignore invalid JSON and use the fallback message.
+      }
+      return { success: false, error: errorMessage };
+    }
     return res.ok ? await res.json() : null;
   };
 
@@ -456,19 +474,24 @@ export default function AdminPage() {
         assetUrl = up.url;
       }
 
-      const response = await fetch("/api/slider", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          slider: "HOMEPAGE_HERO_SLIDER",
-          mediaType: sliderMediaType,
-          assetUrl,
-          headline: sliderHeadline,
-          actionLink: sliderActionLink,
-        }),
-      });
+        if (sliderMediaType === "video" && sliderVideoSource === "gallery") {
+          if (!sliderFile) {
+            setSliderStatus("Select a video file from gallery or switch to link mode.");
+            return;
+          }
+          const up = await uploadFile(sliderFile);
+          if (!up?.success) {
+            setSliderStatus(up?.error || "Video upload failed.");
+            return;
+          }
+          assetUrl = up.url;
+        }
 
-      const data = await response.json();
+        if (sliderMediaType === "video" && sliderVideoSource === "link" && !assetUrl) {
+          setSliderStatus("Video URL or embed link is required.");
+          return;
+        }
+
       if (!response.ok || !data.success) {
         setSliderStatus("Failed to add slide.");
         return;
@@ -478,6 +501,7 @@ export default function AdminPage() {
       setSliderActionLink("");
       setSliderAssetUrl("");
       setSliderMediaType("image");
+      setSliderVideoSource("link");
       setSliderFile(null);
       setSliderPreviewUrl("");
       setSliderStatus("Slide added successfully.");
@@ -846,12 +870,40 @@ export default function AdminPage() {
                   ) : null}
                 </>
               ) : (
-                <input
-                  className="w-full rounded border px-3 py-2"
-                  placeholder="Video URL or embed URL"
-                  value={sliderAssetUrl}
-                  onChange={(e) => setSliderAssetUrl(e.target.value)}
-                />
+                <>
+                  <select
+                    className="w-full rounded border px-3 py-2"
+                    value={sliderVideoSource}
+                    onChange={(e) => setSliderVideoSource(e.target.value as "link" | "gallery")}
+                  >
+                    <option value="link">Video link</option>
+                    <option value="gallery">Upload from gallery</option>
+                  </select>
+                  {sliderVideoSource === "gallery" ? (
+                    <>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        className="w-full rounded border px-3 py-2"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setSliderFile(file);
+                          setSliderPreviewUrl(file ? file.name : "");
+                        }}
+                      />
+                      {sliderFile ? (
+                        <p className="mt-2 text-sm text-slate-600">Selected video: {sliderFile.name}</p>
+                      ) : null}
+                    </>
+                  ) : (
+                    <input
+                      className="w-full rounded border px-3 py-2"
+                      placeholder="Video URL or embed URL"
+                      value={sliderAssetUrl}
+                      onChange={(e) => setSliderAssetUrl(e.target.value)}
+                    />
+                  )}
+                </>
               )}
 
               <button
