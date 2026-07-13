@@ -5,6 +5,8 @@ import { GalleryPreview } from "@/components/GalleryPreview";
 import { ServiceCard } from "@/components/ServiceCard";
 import { HomeSlider } from "@/components/HomeSlider";
 import { QuotesSection } from "@/components/QuotesSection";
+import { ReviewsSection } from "@/components/ReviewsSection";
+import { ReviewForm } from "@/components/ReviewForm";
 import { serviceKeys } from "@/data/services";
 import { blogPosts } from "@/data/blog";
 
@@ -163,6 +165,8 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
+      <ReviewsSection title={t("quotesTitle")} subtitle={t("quotesSubtitle")} />
+      <ReviewForm />
       <QuotesSection title={t("quotesTitle")} subtitle={t("quotesSubtitle")} />
     </>
   );
