@@ -142,17 +142,34 @@ export async function getServiceContent(serviceKey: ServiceKey, locale = "en", v
 
   if (variant) {
     const exactMatch = await collection.findOne({ serviceKey, locale, variant });
-    return normalizeServiceContent(exactMatch);
+    if (exactMatch || locale === "en") return normalizeServiceContent(exactMatch);
+
+    return normalizeServiceContent(await collection.findOne({ serviceKey, locale: "en", variant }));
   }
 
   const fallbackMatch = await collection.findOne({ serviceKey, locale });
-  return normalizeServiceContent(fallbackMatch);
+  if (fallbackMatch || locale === "en") return normalizeServiceContent(fallbackMatch);
+
+  return normalizeServiceContent(await collection.findOne({ serviceKey, locale: "en" }));
 }
 
 export async function getAllServiceContent(locale = "en") {
   const db = await getDb();
-  const contents = await db.collection<ServiceContent>("service_content").find({ locale }).toArray();
-  return contents.map(normalizeServiceContent).filter((content): content is NonNullable<typeof content> => content !== null);
+  const collection = db.collection<ServiceContent>("service_content");
+  const localizedContents = await collection.find({ locale }).toArray();
+
+  if (locale === "en") {
+    return localizedContents.map(normalizeServiceContent).filter((content): content is NonNullable<typeof content> => content !== null);
+  }
+
+  const englishContents = await collection.find({ locale: "en" }).toArray();
+  const localizedVariants = new Set(localizedContents.map((content) => `${content.serviceKey}:${content.variant || ""}`));
+  const mergedContents = [
+    ...localizedContents,
+    ...englishContents.filter((content) => !localizedVariants.has(`${content.serviceKey}:${content.variant || ""}`)),
+  ];
+
+  return mergedContents.map(normalizeServiceContent).filter((content): content is NonNullable<typeof content> => content !== null);
 }
 export async function upsertServiceContent(content: ServiceContent) {
   const db = await getDb();

@@ -4,7 +4,11 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { serviceKeys } from "@/data/services";
 
-export function ContactForm() {
+type ContactFormProps = {
+  variant?: "default" | "popup";
+};
+
+export function ContactForm({ variant = "default" }: ContactFormProps) {
   const t = useTranslations("contact.form");
   const tItems = useTranslations("services.items");
   const [submitted, setSubmitted] = useState(false);
@@ -50,56 +54,56 @@ export function ContactForm() {
     );
   }
 
+  const isPopup = variant === "popup";
+  const fieldClassName = isPopup
+    ? "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm transition placeholder:text-slate-400 focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20"
+    : "w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20";
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className={isPopup ? "space-y-3" : "space-y-4"}>
       <div>
-        <label htmlFor="name" className="mb-1 block text-sm font-medium text-slate-700">
-          {t("name")}
-        </label>
+        {!isPopup && <label htmlFor="name" className="mb-1 block text-sm font-medium text-slate-700">{t("name")}</label>}
         <input
           id="name"
           name="name"
           type="text"
           required
-          className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
+          placeholder={isPopup ? t("name") : undefined}
+          className={fieldClassName}
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className={isPopup ? "space-y-3" : "grid gap-4 sm:grid-cols-2"}>
         <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700">
-            {t("email")}
-          </label>
+          {!isPopup && <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700">{t("email")}</label>}
           <input
             id="email"
             name="email"
             type="email"
             required
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
+            placeholder={isPopup ? t("email") : undefined}
+            className={fieldClassName}
           />
         </div>
         <div>
-          <label htmlFor="phone" className="mb-1 block text-sm font-medium text-slate-700">
-            {t("phone")}
-          </label>
+          {!isPopup && <label htmlFor="phone" className="mb-1 block text-sm font-medium text-slate-700">{t("phone")}</label>}
           <input
             id="phone"
             name="phone"
             type="tel"
             required
-            className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
+            placeholder={isPopup ? t("phone") : undefined}
+            className={fieldClassName}
           />
         </div>
       </div>
       <div>
-        <label htmlFor="service" className="mb-1 block text-sm font-medium text-slate-700">
-          {t("service")}
-        </label>
+        {!isPopup && <label htmlFor="service" className="mb-1 block text-sm font-medium text-slate-700">{t("service")}</label>}
         <select
           id="service"
           name="service"
           required
           defaultValue=""
-          className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
+          className={fieldClassName}
         >
           <option value="" disabled>
             {t("selectService")}
@@ -112,21 +116,20 @@ export function ContactForm() {
         </select>
       </div>
       <div>
-        <label htmlFor="message" className="mb-1 block text-sm font-medium text-slate-700">
-          {t("message")}
-        </label>
+        {!isPopup && <label htmlFor="message" className="mb-1 block text-sm font-medium text-slate-700">{t("message")}</label>}
         <textarea
           id="message"
           name="message"
-          rows={5}
+          rows={isPopup ? 3 : 5}
           required
-          className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
+          placeholder={isPopup ? t("message") : undefined}
+          className={fieldClassName}
         />
       </div>
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-lg bg-brand-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-green-dark sm:w-auto sm:px-8"
+        className={isPopup ? "w-full rounded-xl bg-brand-green py-3 text-sm font-bold uppercase tracking-wide text-white shadow-sm transition hover:bg-brand-green-dark" : "w-full rounded-lg bg-brand-green py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-green-dark sm:w-auto sm:px-8"}
       >
         {submitting ? "Sending..." : t("submit")}
       </button>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type LogoProps = {
@@ -16,34 +17,13 @@ export function Logo({ locale, showText = true, size = "md" }: LogoProps) {
 
   return (
     <Link href={`/${locale}`} className="flex items-center gap-3 group">
-      <svg
+      <Image
+        src="/images/green-flow-logo.png"
+        alt="Green Flow Engineers"
         width={s.icon}
         height={s.icon}
-        viewBox="0 0 64 64"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden
-        className="shrink-0"
-      >
-        <circle cx="32" cy="32" r="30" fill="#ecfdf5" stroke="#059669" strokeWidth="2" />
-        <circle cx="32" cy="32" r="18" fill="none" stroke="#0284c7" strokeWidth="3" strokeDasharray="4 3" />
-        <circle cx="32" cy="32" r="8" fill="#0284c7" />
-        <path
-          d="M32 8 C38 18 42 24 32 32 C22 24 26 18 32 8Z"
-          fill="#059669"
-        />
-        <path
-          d="M28 30 C26 34 24 38 32 42 C40 38 38 34 36 30"
-          fill="#16a34a"
-          opacity="0.9"
-        />
-        <path
-          d="M32 42 L32 52 M28 48 L32 52 L36 48"
-          stroke="#059669"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
+        className="shrink-0 object-contain"
+      />
       {showText && (
         <div className="flex flex-col leading-tight">
           <span className={`font-bold text-brand-green-dark ${s.text}`}>
