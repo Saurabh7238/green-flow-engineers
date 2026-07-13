@@ -255,20 +255,41 @@ export default function AdminPage() {
   };
 
   const uploadFile = async (file: File) => {
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch("/api/upload-file", { method: "POST", body: form });
-    if (!res.ok) {
-      let errorMessage = "File upload failed";
-      try {
-        const data = await res.json();
-        if (data?.error) errorMessage = data.error;
-      } catch {
-        // Ignore invalid JSON and use the fallback message.
+    // Use presigned S3 upload to avoid sending large multipart bodies to serverless functions
+    // Use chunked upload to GridFS for MongoDB storage to avoid function payload limits
+    const CHUNK_SIZE = 2 * 1024 * 1024; // 2MB
+    const sessionId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    try {
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * CHUNK_SIZE;
+        const end = Math.min(file.size, start + CHUNK_SIZE);
+        const blob = file.slice(start, end);
+        const form = new FormData();
+        form.append("chunk", blob, file.name);
+        form.append("sessionId", sessionId);
+        form.append("index", String(i));
+        form.append("filename", file.name);
+        form.append("contentType", file.type || "application/octet-stream");
+
+        const res = await fetch("/api/upload-file/chunk", { method: "POST", body: form });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          return { success: false, error: err?.error || "Failed to upload chunk" };
+        }
       }
-      return { success: false, error: errorMessage };
+
+      const completeRes = await fetch("/api/upload-file/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, filename: file.name }),
+      });
+      const completeData = await completeRes.json();
+      if (!completeRes.ok || !completeData?.success) return { success: false, error: completeData?.error || "Failed to assemble upload" };
+      return { success: true, url: completeData.url };
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : String(err) };
     }
-    return res.ok ? await res.json() : null;
   };
 
   const loadSlides = async () => {
@@ -343,10 +364,22 @@ export default function AdminPage() {
   };
 
   const uploadNotificationFile = async (file: File) => {
-    const form = new FormData();
-    form.append("file", file);
-    const response = await fetch("/api/upload-file", { method: "POST", body: form });
-    return (await response.json()) as { success?: boolean; url?: string; error?: string };
+    try {
+      const pres = await fetch("/api/upload-presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, contentType: file.type }),
+      });
+      const presData = await pres.json();
+      if (!pres.ok || !presData?.url) return { success: false, error: presData?.error || "Failed to get upload URL" };
+
+      const putRes = await fetch(presData.url, { method: "PUT", headers: { "Content-Type": file.type }, body: file });
+      if (!putRes.ok) return { success: false, error: "Failed to upload file to storage" };
+
+      return { success: true, url: presData.publicUrl };
+    } catch (err) {
+      return { success: false, error: err instanceof Error ? err.message : String(err) };
+    }
   };
 
   const saveNotification = async () => {
