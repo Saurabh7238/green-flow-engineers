@@ -492,8 +492,20 @@ export default function AdminPage() {
           return;
         }
 
-      if (!response.ok || !data.success) {
-        setSliderStatus("Failed to add slide.");
+      const res = await fetch("/api/slider", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slider: "HOMEPAGE_HERO_SLIDER",
+          mediaType: sliderMediaType,
+          assetUrl,
+          headline: sliderHeadline.trim() || undefined,
+          actionLink: sliderActionLink.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setSliderStatus(data?.error || "Failed to add slide.");
         return;
       }
 
