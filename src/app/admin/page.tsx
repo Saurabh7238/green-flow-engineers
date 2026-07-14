@@ -972,8 +972,6 @@ export default function AdminPage() {
         <p className="mt-4 text-sm text-slate-600">{sliderStatus}</p>
       </div>
 
-      </div>
-
       <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

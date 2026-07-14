@@ -1,6 +1,5 @@
 import "server-only";
 import { MongoClient } from "mongodb";
-import { connection } from "next/server";
 
 const options = {};
 
@@ -48,6 +47,9 @@ export async function getMongoClient() {
 export async function getDb() {
   // Database-backed pages must wait for a request. Otherwise Next.js tries to
   // authenticate with MongoDB while prerendering pages during `next build`.
+  // Import `connection` dynamically so files that import this module but are
+  // statically prerendered (SSG) don't trigger dynamic server usage at build time.
+  const { connection } = await import("next/server");
   await connection();
   const client = await getMongoClient();
   return client.db("greenflow");

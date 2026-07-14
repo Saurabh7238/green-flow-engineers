@@ -1,8 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { getFeaturedGallery } from "@/data/gallery";
-import { listGalleryItems } from "@/lib/gallery-content";
+import type { ManagedGalleryItem } from "@/lib/gallery-content";
 
 type Props = { locale: string };
 
@@ -14,29 +17,35 @@ function normalizeGalleryImageUrl(image: string) {
     return image;
   }
 }
-
-export async function GalleryPreview({ locale }: Props) {
-  const t = await getTranslations("gallery");
+export function GalleryPreview({ locale }: Props) {
+  const t = useTranslations("gallery");
   const loc = locale as "en" | "hi";
   const fallbackItems = getFeaturedGallery(6);
-  let managedItems: typeof fallbackItems = [];
 
-  try {
-    const savedItems = await listGalleryItems();
-    managedItems = savedItems
-      .filter((item) => item.featured)
-      .map((item) => ({
-        id: `managed-${item.id}`,
-        type: item.type,
-        image: normalizeGalleryImageUrl(item.image),
-        title: item.title,
-        description: item.description,
-        location: item.location,
-        featured: true,
-      }));
-  } catch (error) {
-    console.error("Failed to load managed gallery previews:", error);
-  }
+  const [managedItems, setManagedItems] = useState<ManagedGalleryItem[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/gallery", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!mounted) return;
+        const saved: ManagedGalleryItem[] = Array.isArray(data.data) ? data.data : [];
+        setManagedItems(
+          saved
+            .filter((item) => item.featured)
+            .map((item) => ({ ...item, image: normalizeGalleryImageUrl(item.image) })),
+        );
+      } catch (err) {
+        // Ignore — we'll show fallback items
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const items = [...managedItems, ...fallbackItems].slice(0, 6);
 
@@ -48,10 +57,7 @@ export async function GalleryPreview({ locale }: Props) {
             <h2 className="text-2xl font-bold text-slate-900">{t("featuredTitle")}</h2>
             <p className="mt-2 text-slate-600">{t("featuredSubtitle")}</p>
           </div>
-          <Link
-            href={`/${locale}/gallery`}
-            className="text-sm font-semibold text-brand-blue hover:text-brand-blue-dark"
-          >
+          <Link href={`/${locale}/gallery`} className="text-sm font-semibold text-brand-blue hover:text-brand-blue-dark">
             {t("viewGallery")} →
           </Link>
         </div>
@@ -65,14 +71,14 @@ export async function GalleryPreview({ locale }: Props) {
               <div className="relative aspect-[4/3]">
                 <Image
                   src={item.image}
-                  alt={item.title[loc]}
+                  alt={typeof item.title === "string" ? item.title : item.title[loc]}
                   fill
                   className="object-cover transition duration-300 group-hover:scale-105"
                   sizes="(max-width: 768px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
                 <p className="absolute bottom-0 left-0 right-0 p-3 text-sm font-semibold text-white opacity-0 transition group-hover:opacity-100">
-                  {item.title[loc]}
+                  {typeof item.title === "string" ? item.title : item.title[loc]}
                 </p>
               </div>
             </Link>
