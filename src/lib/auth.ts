@@ -71,7 +71,7 @@ export async function findOrCreateAdminUser() {
       email: "admin@mail.com",
       mobile: "0000000000",
       password: "admin123",
-      role: "admin",
+      role: "user",
     };
 
     const result = await users.insertOne({

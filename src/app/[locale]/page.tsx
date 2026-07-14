@@ -4,11 +4,11 @@ import type { Metadata } from "next";
 import { GalleryPreview } from "@/components/GalleryPreview";
 import { ServiceCard } from "@/components/ServiceCard";
 import { HomeSlider } from "@/components/HomeSlider";
-import { QuotesSection } from "@/components/QuotesSection";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { ReviewForm } from "@/components/ReviewForm";
 import { serviceKeys } from "@/data/services";
 import { blogPosts } from "@/data/blog";
+import { siteUrl } from "@/lib/site-url";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -30,6 +30,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: t("siteName"),
     description: t("description"),
+    openGraph: {
+      title: t("siteName"),
+      description: t("description"),
+      url: `${siteUrl}/${locale}`,
+      type: "website",
+      images: [
+        {
+          url: `${siteUrl}/images/green-flow-logo.png`,
+          width: 300,
+          height: 300,
+          alt: "Green Flow Engineers Logo",
+          type: "image/png",
+        },
+        {
+          url: `${siteUrl}/images/service-title-logo.jpeg`,
+          width: 1200,
+          height: 630,
+          alt: "Green Flow Engineers",
+          type: "image/jpeg",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t("siteName"),
+      description: t("description"),
+      images: [`${siteUrl}/images/service-title-logo.jpeg`],
+    },
   };
 }
 
@@ -167,7 +195,6 @@ export default async function HomePage({ params }: Props) {
 
       <ReviewsSection title={t("quotesTitle")} subtitle={t("quotesSubtitle")} />
       <ReviewForm />
-      <QuotesSection title={t("quotesTitle")} subtitle={t("quotesSubtitle")} />
     </>
   );
 }

@@ -272,7 +272,7 @@ export function Header() {
             <Link
               key={key}
               href={href(key)}
-              className="text-sm font-medium text-slate-600 transition hover:text-brand-green-dark"
+              className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-green hover:text-white"
             >
               {t(key)}
             </Link>
@@ -354,7 +354,7 @@ export function Header() {
                 key={key}
                 href={href(key)}
                 onClick={() => setOpen(false)}
-                className="text-base font-medium text-slate-700"
+                className="rounded-lg bg-slate-100 px-3 py-2 text-base font-medium text-slate-700 transition hover:bg-brand-green hover:text-white"
               >
                 {t(key)}
               </Link>

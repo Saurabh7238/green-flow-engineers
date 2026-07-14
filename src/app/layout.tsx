@@ -17,16 +17,45 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Green Flow Engineers | Sustainable Industrial Solutions",
-    template: "%s | Green Flow Engineers",
+    default: "Green Flow Engineers",
+    template: "%s",
   },
   description:
     "WTP, STP, ETP, RO plants, HVAC, textile machinery, fire fighting systems, and industrial lighting — supply, installation & commissioning in Kanpur, India.",
   keywords: siteConfig.keywords,
+  icons: {
+    icon: `${siteUrl}/images/green-flow-logo.png`,
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
     siteName: "Green Flow Engineers",
+    title: "Green Flow Engineers | Sustainable Industrial Solutions",
+    description:
+      "WTP, STP, ETP, RO plants, HVAC, textile machinery, fire fighting systems, and industrial lighting — supply, installation & commissioning in Kanpur, India.",
+    images: [
+      {
+        url: `${siteUrl}/images/green-flow-logo.png`,
+        width: 300,
+        height: 300,
+        alt: "Green Flow Engineers Logo",
+        type: "image/png",
+      },
+      {
+        url: `${siteUrl}/images/service-title-logo.jpeg`,
+        width: 1200,
+        height: 630,
+        alt: "Green Flow Engineers",
+        type: "image/jpeg",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Green Flow Engineers",
+    description:
+      "WTP, STP, ETP, RO plants, HVAC, textile machinery, fire fighting systems, and industrial lighting — supply, installation & commissioning in Kanpur, India.",
+    images: [`${siteUrl}/images/service-title-logo.jpeg`],
   },
   robots: {
     index: true,
