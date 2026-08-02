@@ -23,8 +23,6 @@ export async function POST(request: Request) {
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const review = typeof body.review === "string" ? body.review.trim() : "";
     const rating = Number(body.rating);
-    const photoUrl = typeof body.photoUrl === "string" ? body.photoUrl.trim() : "";
-
     if (!name || !review) {
       return NextResponse.json({ error: "Name and review text are required" }, { status: 400 });
     }
@@ -33,7 +31,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Rating must be between 1 and 5" }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, data: await createReview({ name, rating, review, photoUrl }) }, { status: 201 });
+    return NextResponse.json({ success: true, data: await createReview({ name, rating, review }) }, { status: 201 });
   } catch (error) {
     console.error("Failed to create review:", error);
     return NextResponse.json({ error: "Failed to save review" }, { status: 500 });

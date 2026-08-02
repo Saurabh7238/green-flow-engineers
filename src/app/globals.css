@@ -50,6 +50,30 @@ body::before {
   }
 }
 
+@keyframes marquee-right-to-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee {
+  position: relative;
+}
+
+.marquee__track {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  animation: marquee-right-to-left 10s linear infinite;
+}
+
+.marquee__track:hover {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   body::before {
     animation: none;
@@ -98,3 +122,4 @@ body::before {
   font-weight: 600;
   color: var(--blue-dark);
 }
+

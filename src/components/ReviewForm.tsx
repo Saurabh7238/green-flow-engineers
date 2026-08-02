@@ -6,8 +6,7 @@ export function ReviewForm() {
   const [name, setName] = useState("");
   const [rating, setRating] = useState(5);
   const [review, setReview] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -18,23 +17,10 @@ export function ReviewForm() {
     setStatus("");
 
     try {
-      let uploadedPhotoUrl = photoUrl.trim();
-      if (photoFile) {
-        const formData = new FormData();
-        formData.append("image", photoFile);
-        const uploadResponse = await fetch("/api/upload-image", { method: "POST", body: formData });
-        const uploadData = await uploadResponse.json();
-        if (!uploadResponse.ok || !uploadData?.success) {
-          setStatus(uploadData?.error || "Image upload failed.");
-          return;
-        }
-        uploadedPhotoUrl = uploadData.url;
-      }
-
       const response = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, rating, review, photoUrl: uploadedPhotoUrl }),
+        body: JSON.stringify({ name, rating, review }),
       });
       const data = await response.json();
 
@@ -46,8 +32,7 @@ export function ReviewForm() {
       setName("");
       setRating(5);
       setReview("");
-      setPhotoUrl("");
-      setPhotoFile(null);
+      
       setSubmitted(true);
       setStatus("Thank you! Your review is pending admin approval.");
     } catch (error) {
@@ -110,21 +95,7 @@ export function ReviewForm() {
                 />
               </div>
 
-              <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Photo upload (optional)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) => setPhotoFile(event.target.files?.[0] || null)}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
-                />
-                <input
-                  value={photoUrl}
-                  onChange={(event) => setPhotoUrl(event.target.value)}
-                  className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
-                  placeholder="Or paste a photo URL"
-                />
-              </div>
+              {/* image and URL inputs removed */}
 
               <button type="submit" disabled={loading} className="rounded-lg bg-brand-green px-4 py-2 font-semibold text-white disabled:opacity-60">
                 {loading ? "Submitting..." : "Submit review"}

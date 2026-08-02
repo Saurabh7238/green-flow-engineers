@@ -25,7 +25,7 @@ type SliderItem = { id: string; sequence: number; mediaType: "image" | "video"; 
 type AdminNotification = { id: string; title: string; message: string; image?: string; file?: string; active: boolean; expiresAt?: string | null };
 type Enquiry = { id: string; name: string; email: string; phone: string; service: string; message: string; createdAt: string };
 type ReviewStatus = "pending" | "approved" | "rejected";
-type CustomerReview = { id: string; name: string; rating: number; review: string; photoUrl?: string; status: ReviewStatus; createdAt: string };
+type CustomerReview = { id: string; name: string; rating: number; review: string; status: ReviewStatus; createdAt: string };
 
 const SUBTYPE_MAP: Record<string, string[]> = {
   water: ["Water Treatment Plant (WTP)", "Sewage Treatment Plant (STP)", "Effluent Treatment Plant (ETP)", "Industrial RO System"],
@@ -1008,7 +1008,7 @@ export default function AdminPage() {
                   <h3 className="font-semibold text-slate-900">{review.name}</h3>
                   <p className="mt-1 text-sm text-slate-600">Rating: {"★".repeat(review.rating)}{review.rating < 5 ? "☆".repeat(5 - review.rating) : ""}</p>
                   <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{review.review}</p>
-                  {review.photoUrl ? <img src={review.photoUrl} alt={review.name} className="mt-3 h-28 w-40 rounded object-cover" /> : null}
+                  {/* photo removed from reviews */}
                 </div>
                 <div className="text-sm text-slate-600 sm:text-right">
                   <p className="font-medium text-slate-800">Status: {review.status}</p>

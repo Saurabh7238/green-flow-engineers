@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { GalleryPreview } from "@/components/GalleryPreview";
 import { ServiceCard } from "@/components/ServiceCard";
 import { HomeSlider } from "@/components/HomeSlider";
+import { StatsBar } from "@/components/StatsBar";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { ReviewForm } from "@/components/ReviewForm";
 import { serviceKeys } from "@/data/services";
@@ -12,16 +13,18 @@ import { siteUrl } from "@/lib/site-url";
 
 type Props = { params: Promise<{ locale: string }> };
 
-const coreValueColorClasses = [
+const coreValueHighlightClasses = [
   "border-emerald-200 bg-emerald-50 text-emerald-950",
   "border-sky-200 bg-sky-50 text-sky-950",
   "border-amber-200 bg-amber-50 text-amber-950",
   "border-rose-200 bg-rose-50 text-rose-950",
-  "border-violet-200 bg-violet-50 text-violet-950",
-  "border-cyan-200 bg-cyan-50 text-cyan-950",
-  "border-lime-200 bg-lime-50 text-lime-950",
-  "border-orange-200 bg-orange-50 text-orange-950",
-  "border-indigo-200 bg-indigo-50 text-indigo-950",
+];
+
+const coreValueHighlights = [
+  "End-to-end supply, installation & commissioning",
+  "Eco-conscious designs for long-term savings",
+  "Responsive maintenance and after-sales support",
+  "Industry-standard safety and quality practices",
 ];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -71,7 +74,6 @@ export default async function HomePage({ params }: Props) {
   const tCat = await getTranslations("categories");
   const tAbout = await getTranslations("about");
   const loc = locale as "en" | "hi";
-  const coreValues = tAbout.raw("coreValues") as string[];
 
   const featuredPosts = blogPosts.slice(0, 3);
 
@@ -97,7 +99,12 @@ export default async function HomePage({ params }: Props) {
               environmental impact, and meets global quality standards.
             </p>
           </div>
+        </div>
+      </section>
 
+      <section className="bg-slate-100/80 py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <StatsBar />
         </div>
       </section>
 
@@ -140,16 +147,48 @@ export default async function HomePage({ params }: Props) {
       <section className="bg-slate-100/80 py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="text-2xl font-bold text-slate-900">{tAbout("coreValuesTitle")}</h2>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {coreValues.map((value, index) => (
-              <div
-                key={value}
-                className={`rounded-xl border p-5 font-semibold shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${coreValueColorClasses[index % coreValueColorClasses.length]}`}
-              >
-                <span className="mr-2 text-brand-green" aria-hidden>✓</span>
-                {value}
-              </div>
-            ))}
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+              <p className="text-lg font-semibold text-emerald-950">{coreValueHighlights[0]}</p>
+            </div>
+            <div className="space-y-3">
+              {coreValueHighlights.slice(1).map((value, index) => (
+                <div
+                  key={value}
+                  className={`flex items-start gap-3 rounded-xl border p-4 font-medium shadow-sm ${coreValueHighlightClasses[index + 1]}`}
+                >
+                  <span className="mt-0.5 text-lg text-brand-green" aria-hidden>✓</span>
+                  <span>{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mb-8 text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">Our Clients</p>
+            <h2 className="mt-3 text-2xl font-bold text-slate-900">Trusted by leading brands</h2>
+          </div>
+          <div className="marquee overflow-hidden pb-2">
+            <div className="marquee__track inline-flex items-center gap-4">
+              {[
+                { name: 'Entyaz', logo: '/images/clients/entyaz.svg' },
+                { name: 'Sagar Group', logo: '/images/clients/sagar-group.svg' },
+                { name: 'Bhilosa', logo: '/images/clients/bhilosa.svg' },
+                { name: 'Trident', logo: '/images/clients/trident.svg' },
+                { name: 'Reliance', logo: '/images/clients/reliance.svg' },
+              ].map((client) => (
+                <div
+                  key={client.name}
+                  className="flex h-24 min-w-[10rem] flex-none items-center justify-center rounded-3xl border border-slate-200 bg-slate-50 px-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <img src={client.logo} alt={client.name} className="h-14 w-auto" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

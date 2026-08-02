@@ -7,7 +7,6 @@ export type CustomerReview = {
   name: string;
   rating: number;
   review: string;
-  photoUrl?: string;
   status: ReviewStatus;
   createdAt: Date;
   updatedAt?: Date;
@@ -51,7 +50,6 @@ export async function createReview(input: Omit<CustomerReview, "id" | "createdAt
     name: input.name.trim(),
     rating: Math.min(5, Math.max(1, input.rating)),
     review: input.review.trim(),
-    photoUrl: input.photoUrl?.trim() || "",
     status: input.status || "pending",
     createdAt: new Date(),
     updatedAt: new Date(),

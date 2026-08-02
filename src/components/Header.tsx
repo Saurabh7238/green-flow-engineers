@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { useEffect, useState } from "react";
+import { serviceKeys } from "@/data/services";
 import { Logo } from "./Logo";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
@@ -29,8 +30,11 @@ type CurrentUser = {
 export function Header() {
   const t = useTranslations("nav");
   const tCta = useTranslations("cta");
+  const tServices = useTranslations("services.items");
   const locale = useLocale();
   const [open, setOpen] = useState(false);
+  const [servicesMenuOpen, setServicesMenuOpen] = useState(false);
+  const [servicesHoverOpen, setServicesHoverOpen] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("none");
   const emptyAuthForm = {
     name: "",
@@ -66,6 +70,11 @@ export function Header() {
       window.removeEventListener("storage", syncCurrentUser);
       window.removeEventListener("auth:changed", syncCurrentUser);
     };
+  }, [locale]);
+
+  useEffect(() => {
+    setServicesMenuOpen(false);
+    setServicesHoverOpen(false);
   }, [locale]);
 
   const href = (key: typeof navItems[number]) => {
@@ -268,15 +277,65 @@ export function Header() {
         <Logo locale={locale} />
 
         <nav className="hidden items-center gap-6 md:flex" aria-label="Main">
-          {navItems.map((key) => (
-            <Link
-              key={key}
-              href={href(key)}
-              className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-green hover:text-white"
-            >
-              {t(key)}
-            </Link>
-          ))}
+          {navItems.map((key) => {
+            if (key === "services") {
+              return (
+                <div
+                  key={key}
+                  className="group relative"
+                  onMouseEnter={() => setServicesHoverOpen(true)}
+                  onMouseLeave={() => setServicesHoverOpen(false)}
+                  onFocus={() => setServicesHoverOpen(true)}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                      setServicesHoverOpen(false);
+                    }
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setServicesMenuOpen((prev) => !prev)}
+                    className="flex items-center gap-1 rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-green hover:text-white"
+                    aria-expanded={servicesMenuOpen || servicesHoverOpen}
+                  >
+                    <span>{t(key)}</span>
+                    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+
+                  {(servicesMenuOpen || servicesHoverOpen) ? (
+                    <div
+                      className="absolute left-0 top-full z-[60] mt-2 w-64 rounded-xl border border-slate-200 bg-white p-2 shadow-xl"
+                      onMouseEnter={() => setServicesHoverOpen(true)}
+                      onMouseLeave={() => setServicesHoverOpen(false)}
+                    >
+                      {serviceKeys.map((serviceKey) => (
+                        <Link
+                          key={serviceKey}
+                          href={`/${locale}/services/${serviceKey}`}
+                          onClick={() => setServicesMenuOpen(false)}
+                          className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-brand-green"
+                        >
+                          {tServices(`${serviceKey}.title`)}
+                        </Link>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={key}
+                href={href(key)}
+                className="rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-brand-green hover:text-white"
+              >
+                {t(key)}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
@@ -349,16 +408,53 @@ export function Header() {
       {open && (
         <div className="border-t border-slate-100 bg-white px-4 py-4 md:hidden">
           <nav className="flex flex-col gap-3" aria-label="Mobile">
-            {navItems.map((key) => (
-              <Link
-                key={key}
-                href={href(key)}
-                onClick={() => setOpen(false)}
-                className="rounded-lg bg-slate-100 px-3 py-2 text-base font-medium text-slate-700 transition hover:bg-brand-green hover:text-white"
-              >
-                {t(key)}
-              </Link>
-            ))}
+            {navItems.map((key) => {
+              if (key === "services") {
+                return (
+                  <div key={key} className="rounded-lg bg-slate-100 px-3 py-2">
+                    <button
+                      type="button"
+                      onClick={() => setServicesMenuOpen((prev) => !prev)}
+                      className="flex w-full items-center justify-between text-base font-medium text-slate-700"
+                    >
+                      <span>{t(key)}</span>
+                      <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+
+                    {servicesMenuOpen ? (
+                      <div className="mt-2 space-y-1 border-t border-slate-200 pt-2">
+                        {serviceKeys.map((serviceKey) => (
+                          <Link
+                            key={serviceKey}
+                            href={`/${locale}/services/${serviceKey}`}
+                            onClick={() => {
+                              setServicesMenuOpen(false);
+                              setOpen(false);
+                            }}
+                            className="block rounded-lg px-2 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-brand-green"
+                          >
+                            {tServices(`${serviceKey}.title`)}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              }
+
+              return (
+                <Link
+                  key={key}
+                  href={href(key)}
+                  onClick={() => setOpen(false)}
+                  className="rounded-lg bg-slate-100 px-3 py-2 text-base font-medium text-slate-700 transition hover:bg-brand-green hover:text-white"
+                >
+                  {t(key)}
+                </Link>
+              );
+            })}
           </nav>
           <div className="mt-4 flex items-center justify-between">
             <LanguageSwitcher />

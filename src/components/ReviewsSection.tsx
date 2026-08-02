@@ -91,11 +91,7 @@ export function ReviewsSection({ title = "What our clients say", subtitle = "Tru
                         <p className="mt-4 font-semibold text-slate-900">{review.name}</p>
                       </div>
 
-                      {review.photoUrl ? (
-                        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-sm lg:w-48">
-                          <img src={review.photoUrl} alt={review.name} className="h-40 w-full rounded-xl object-cover" />
-                        </div>
-                      ) : null}
+                      {/* photo removed from reviews */}
                     </div>
                   </div>
                 ))}
