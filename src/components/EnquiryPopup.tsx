@@ -5,18 +5,32 @@ import { useEffect, useState } from "react";
 import { ContactForm } from "@/components/ContactForm";
 import { Logo } from "@/components/Logo";
 
+const INITIAL_DELAY_MS = 15_000;
+const DISMISSAL_COOLDOWN_MS = 120_000;
+
 export function EnquiryPopup() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [dismissalCount, setDismissalCount] = useState(0);
+  const isHomePage = /^\/(en|hi)\/?$/.test(pathname);
 
   useEffect(() => {
-    if (pathname.endsWith("/enquiry")) return;
+    if (!isHomePage) {
+      setOpen(false);
+      return;
+    }
 
-    const timer = window.setTimeout(() => setOpen(true), 10_000);
+    const delay = dismissalCount === 0 ? INITIAL_DELAY_MS : DISMISSAL_COOLDOWN_MS;
+    const timer = window.setTimeout(() => setOpen(true), delay);
     return () => window.clearTimeout(timer);
-  }, [pathname]);
+  }, [dismissalCount, isHomePage]);
 
-  if (!open || pathname.endsWith("/enquiry")) return null;
+  const dismissPopup = () => {
+    setOpen(false);
+    setDismissalCount((count) => count + 1);
+  };
+
+  if (!open || !isHomePage) return null;
 
   const locale = pathname.split("/")[1] || "en";
 
@@ -27,13 +41,13 @@ export function EnquiryPopup() {
       aria-modal="true"
       aria-labelledby="enquiry-popup-title"
       onClick={(event) => {
-        if (event.target === event.currentTarget) setOpen(false);
+        if (event.target === event.currentTarget) dismissPopup();
       }}
     >
       <section className="relative max-h-[calc(100vh-2rem)] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
         <button
           type="button"
-          onClick={() => setOpen(false)}
+          onClick={dismissPopup}
           aria-label="Close enquiry form"
           className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-slate-900/10 text-2xl leading-none text-slate-700 transition hover:bg-slate-900/20 focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2"
         >

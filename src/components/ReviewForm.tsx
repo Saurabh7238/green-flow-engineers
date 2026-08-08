@@ -1,9 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useLocale } from "next-intl";
+import { useEffect, useState } from "react";
+
+type CurrentUser = {
+  username: string;
+  name?: string;
+};
+
+const currentUserStorageKey = "greenflow-current-user";
 
 export function ReviewForm() {
-  const [name, setName] = useState("");
+  const locale = useLocale();
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [rating, setRating] = useState(5);
   const [review, setReview] = useState("");
   
@@ -11,8 +21,22 @@ export function ReviewForm() {
   const [status, setStatus] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  useEffect(() => {
+    try {
+      const savedUser = window.localStorage.getItem(currentUserStorageKey);
+      setCurrentUser(savedUser ? JSON.parse(savedUser) : null);
+    } catch {
+      setCurrentUser(null);
+    }
+  }, []);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!currentUser) {
+      setSubmitted(false);
+      setStatus("Login required to submit a review.");
+      return;
+    }
     setLoading(true);
     setStatus("");
 
@@ -20,7 +44,7 @@ export function ReviewForm() {
       const response = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, rating, review }),
+        body: JSON.stringify({ name: currentUser.name || currentUser.username, rating, review }),
       });
       const data = await response.json();
 
@@ -29,7 +53,6 @@ export function ReviewForm() {
         return;
       }
 
-      setName("");
       setRating(5);
       setReview("");
       
@@ -58,17 +81,6 @@ export function ReviewForm() {
           <form onSubmit={handleSubmit} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Name</label>
-                <input
-                  required
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
-                  placeholder="Your name"
-                />
-              </div>
-
-              <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700">Rating</label>
                 <select
                   value={rating}
@@ -89,7 +101,7 @@ export function ReviewForm() {
                   required
                   value={review}
                   onChange={(event) => setReview(event.target.value)}
-                  rows={5}
+                  rows={3}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2"
                   placeholder="Share your experience"
                 />
@@ -103,9 +115,10 @@ export function ReviewForm() {
             </div>
 
             {submitted || status ? (
-              <p className={`mt-4 text-sm ${submitted ? "text-emerald-700" : "text-slate-600"}`}>
-                {status || "Thank you! Your review is pending admin approval."}
-              </p>
+              <div className={`mt-4 text-sm ${submitted ? "text-emerald-700" : "text-slate-600"}`}>
+                <p>{status || "Thank you! Your review is pending admin approval."}</p>
+                {!currentUser && status ? <Link href={`/${locale}/login?returnTo=${encodeURIComponent("/" + locale)}`} className="mt-1 inline-block font-semibold text-brand-green-dark hover:underline">Log in now</Link> : null}
+              </div>
             ) : null}
           </form>
         </div>

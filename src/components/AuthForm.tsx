@@ -19,6 +19,9 @@ type AuthUser = {
 
 type CurrentUser = {
   username: string;
+  name?: string;
+  email?: string;
+  mobile?: string;
   role: "admin" | "user";
 };
 
@@ -103,7 +106,8 @@ export function AuthForm({ mode }: AuthFormProps) {
         resetAuthForm();
         setFeedback("Account created successfully. Redirecting to login...", "success");
         window.setTimeout(() => {
-          router.push(`/${locale}/login`);
+          const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+          router.push(returnTo?.startsWith(`/${locale}`) ? `/${locale}/login?returnTo=${encodeURIComponent(returnTo)}` : `/${locale}/login`);
         }, 800);
         return;
       }
@@ -129,11 +133,18 @@ export function AuthForm({ mode }: AuthFormProps) {
         return;
       }
 
-      saveCurrentUser({ username: data.user.name || data.user.email, role: data.user.role });
+      saveCurrentUser({
+        username: data.user.name || data.user.email,
+        name: data.user.name || data.user.email,
+        email: data.user.email,
+        mobile: data.user.mobile,
+        role: data.user.role,
+      });
       resetAuthForm();
       setFeedback("Login successful. Redirecting...", "success");
       window.setTimeout(() => {
-        router.push(`/${locale}`);
+        const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+        router.push(returnTo?.startsWith(`/${locale}`) ? returnTo : `/${locale}`);
       }, 600);
     } catch {
       setFeedback("Unable to complete that action right now.", "error");

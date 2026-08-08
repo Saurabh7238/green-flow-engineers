@@ -1,22 +1,53 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useState } from "react";
+import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import { serviceKeys } from "@/data/services";
 
 type ContactFormProps = {
   variant?: "default" | "popup";
 };
 
+type CurrentUser = {
+  username: string;
+  name?: string;
+  email?: string;
+  mobile?: string;
+};
+
+const currentUserStorageKey = "greenflow-current-user";
+
 export function ContactForm({ variant = "default" }: ContactFormProps) {
   const t = useTranslations("contact.form");
   const tItems = useTranslations("services.items");
+  const locale = useLocale();
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const syncCurrentUser = () => {
+      try {
+        const savedUser = window.localStorage.getItem(currentUserStorageKey);
+        setCurrentUser(savedUser ? JSON.parse(savedUser) : null);
+      } catch {
+        setCurrentUser(null);
+      }
+    };
+
+    syncCurrentUser();
+    window.addEventListener("auth:changed", syncCurrentUser);
+    return () => window.removeEventListener("auth:changed", syncCurrentUser);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!currentUser) {
+      setError("Login required to send an enquiry.");
+      return;
+    }
     setSubmitting(true);
     setError("");
 
@@ -60,14 +91,15 @@ export function ContactForm({ variant = "default" }: ContactFormProps) {
     : "w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-blue focus:outline-none focus:ring-2 focus:ring-brand-blue/20";
 
   return (
-    <form onSubmit={handleSubmit} className={isPopup ? "space-y-3" : "space-y-4"}>
+    <form key={currentUser?.username ?? "guest"} onSubmit={handleSubmit} className={isPopup ? "space-y-3" : "space-y-4"}>
       <div>
         {!isPopup && <label htmlFor="name" className="mb-1 block text-sm font-medium text-slate-700">{t("name")}</label>}
         <input
           id="name"
           name="name"
           type="text"
-          required
+          required={Boolean(currentUser)}
+          defaultValue={currentUser?.name || currentUser?.username || ""}
           placeholder={isPopup ? t("name") : undefined}
           className={fieldClassName}
         />
@@ -79,7 +111,8 @@ export function ContactForm({ variant = "default" }: ContactFormProps) {
             id="email"
             name="email"
             type="email"
-            required
+            required={Boolean(currentUser)}
+            defaultValue={currentUser?.email || ""}
             placeholder={isPopup ? t("email") : undefined}
             className={fieldClassName}
           />
@@ -90,7 +123,8 @@ export function ContactForm({ variant = "default" }: ContactFormProps) {
             id="phone"
             name="phone"
             type="tel"
-            required
+            required={Boolean(currentUser)}
+            defaultValue={currentUser?.mobile || ""}
             placeholder={isPopup ? t("phone") : undefined}
             className={fieldClassName}
           />
@@ -101,7 +135,7 @@ export function ContactForm({ variant = "default" }: ContactFormProps) {
         <select
           id="service"
           name="service"
-          required
+          required={Boolean(currentUser)}
           defaultValue=""
           className={fieldClassName}
         >
@@ -121,7 +155,7 @@ export function ContactForm({ variant = "default" }: ContactFormProps) {
           id="message"
           name="message"
           rows={isPopup ? 3 : 5}
-          required
+          required={Boolean(currentUser)}
           placeholder={isPopup ? t("message") : undefined}
           className={fieldClassName}
         />
@@ -133,7 +167,12 @@ export function ContactForm({ variant = "default" }: ContactFormProps) {
       >
         {submitting ? "Sending..." : t("submit")}
       </button>
-      {error ? <p role="alert" className="text-sm text-red-600">{error}</p> : null}
+      {error ? (
+        <div role="alert" className="text-sm text-red-600">
+          <p>{error}</p>
+          {!currentUser ? <Link href={`/${locale}/login?returnTo=${encodeURIComponent(window.location.pathname)}`} className="mt-1 inline-block font-semibold text-brand-green-dark hover:underline">Log in now</Link> : null}
+        </div>
+      ) : null}
     </form>
   );
 }

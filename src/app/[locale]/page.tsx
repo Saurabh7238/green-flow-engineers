@@ -14,10 +14,10 @@ import { siteUrl } from "@/lib/site-url";
 type Props = { params: Promise<{ locale: string }> };
 
 const coreValueHighlightClasses = [
-  "border-emerald-200 bg-emerald-50 text-emerald-950",
-  "border-sky-200 bg-sky-50 text-sky-950",
-  "border-amber-200 bg-amber-50 text-amber-950",
-  "border-rose-200 bg-rose-50 text-rose-950",
+  "text-emerald-950",
+  "text-sky-950",
+  "text-amber-950",
+  "text-rose-950",
 ];
 
 const coreValueHighlights = [
@@ -102,13 +102,7 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="bg-slate-100/80 py-16">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <StatsBar />
-        </div>
-      </section>
-
-      <section className="bg-slate-100/80 py-16">
+      <section className="bg-slate-100/80 pb-16 pt-4 sm:pt-6">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
             <h2 className="text-2xl font-bold text-slate-900">{t("servicesOverview")}</h2>
@@ -127,7 +121,7 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section className="mx-auto max-w-6xl px-4 pb-4 pt-16 sm:px-6">
         <h2 className="text-2xl font-bold text-slate-900">{t("whyUsTitle")}</h2>
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {(["experience", "sustainability", "support", "compliance"] as const).map(
@@ -144,18 +138,19 @@ export default async function HomePage({ params }: Props) {
         </ul>
       </section>
 
-      <section className="bg-slate-100/80 py-16">
+      <section className="bg-slate-100/80 pb-4 pt-4">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 className="text-2xl font-bold text-slate-900">{tAbout("coreValuesTitle")}</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
-              <p className="text-lg font-semibold text-emerald-950">{coreValueHighlights[0]}</p>
+            <div className="flex items-start gap-3 rounded-2xl p-4 font-medium text-emerald-950 shadow-sm">
+              <span className="mt-0.5 text-lg text-brand-green" aria-hidden>{"\u2713"}</span>
+              <span>{coreValueHighlights[0]}</span>
             </div>
             <div className="space-y-3">
               {coreValueHighlights.slice(1).map((value, index) => (
                 <div
                   key={value}
-                  className={`flex items-start gap-3 rounded-xl border p-4 font-medium shadow-sm ${coreValueHighlightClasses[index + 1]}`}
+                  className={`flex items-start gap-3 rounded-xl p-4 font-medium shadow-sm ${coreValueHighlightClasses[index + 1]}`}
                 >
                   <span className="mt-0.5 text-lg text-brand-green" aria-hidden>✓</span>
                   <span>{value}</span>
@@ -166,7 +161,14 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="bg-white py-16">
+      <section className="bg-slate-100/80 pb-4 pt-2">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <h2 className="mb-2 text-2xl font-bold text-slate-900">Our Achievements</h2>
+          <StatsBar />
+        </div>
+      </section>
+
+      <section className="bg-white pb-16 pt-4">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-8 text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">Our Clients</p>

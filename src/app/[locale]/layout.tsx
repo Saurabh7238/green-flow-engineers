@@ -6,6 +6,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { EnquiryPopup } from "@/components/EnquiryPopup";
 import { NotificationPopup } from "@/components/NotificationPopup";
+import { MobileActionBar } from "@/components/MobileActionBar";
 
 type Props = {
   children: React.ReactNode;
@@ -33,6 +34,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <Footer />
       <NotificationPopup />
       <EnquiryPopup />
+      <MobileActionBar />
     </NextIntlClientProvider>
   );
 }
