@@ -191,11 +191,11 @@ export default async function ServiceDetailPage({ params }: Props) {
         title={
           <div className="flex items-center gap-4">
             <Image
-              src="/images/service-title-logo.jpeg"
-              alt=""
+              src="/images/green-flow-logo.png"
+              alt="Green Flow Engineers"
               width={72}
               height={72}
-              className="h-14 w-14 rounded-xl object-cover sm:h-[72px] sm:w-[72px]"
+              className="h-14 w-14 rounded-xl object-contain sm:h-[72px] sm:w-[72px]"
             />
             <span>{t("title")}</span>
           </div>
