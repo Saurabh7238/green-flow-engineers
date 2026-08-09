@@ -177,10 +177,10 @@ export default async function HomePage({ params }: Props) {
           <div className="marquee overflow-hidden pb-2">
             <div className="marquee__track inline-flex items-center gap-4">
               {[
-                { name: 'Sagar Group', logo: '/images/clients/Sagar.jpeg' },
-                { name: 'Bhilosa', logo: '/images/clients/Bhilosa.jpeg' },
-                { name: 'Trident', logo: '/images/clients/trident.jpeg' },
-                { name: 'Reliance', logo: '/images/clients/Reliance.jpeg' },
+                { name: 'Sagar Group', logo: '/images/clients/Sagar.png' },
+                { name: 'Bhilosa', logo: '/images/clients/Bhilosa.png' },
+                { name: 'Trident', logo: '/images/clients/Trident.png' },
+                { name: 'Reliance', logo: '/images/clients/Reliance.png' },
               ].map((client) => (
                 <div key={client.name} className="client-logo-container">
                   <img src={client.logo} alt={client.name} className="client-logo" />

@@ -129,8 +129,8 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 4rem; /* 64px */
-  height: 4rem; /* 64px */
+  width: 72px;
+  height: 72px;
 }
 .client-logo {
   max-width: 100%;
