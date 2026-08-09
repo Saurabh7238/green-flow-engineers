@@ -83,12 +83,11 @@ export default async function HomePage({ params }: Props) {
 
       <section className="bg-slate-100/80 py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <h2 className="mb-2 text-2xl font-bold text-slate-900">Our Achievements</h2>
           <StatsBar />
         </div>
       </section>
 
-      <section className="border-b border-emerald-100 bg-gradient-to-b from-emerald-50/70 to-white py-16">
+      <section className="border-b border-emerald-100 bg-gradient-to-b from-emerald-50/70 to-white py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-4xl text-center">
             <p className="text-base font-bold uppercase tracking-[0.18em] text-brand-green sm:text-2xl">Green Flow Engineers</p>
