@@ -50,9 +50,9 @@ export function GalleryPreview({ locale }: Props) {
   const items = [...managedItems, ...fallbackItems].slice(0, 6);
 
   return (
-    <section className="bg-slate-100/80 py-16">
+    <section className="bg-slate-100/80 py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">{t("featuredTitle")}</h2>
             <p className="mt-2 text-slate-600">{t("featuredSubtitle")}</p>
