@@ -197,7 +197,7 @@ export default async function HomePage({ params }: Props) {
 
       <GalleryPreview locale={locale} />
 
-      <section className="border-t border-slate-200 bg-white py-16">
+      <section className="border-t border-slate-200 bg-white py-10">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <h2 className="text-2xl font-bold text-slate-900">{tNav("blog")}</h2>

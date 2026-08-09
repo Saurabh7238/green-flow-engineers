@@ -67,9 +67,9 @@ export function ReviewForm() {
   };
 
   return (
-    <section className="bg-slate-50 py-16">
+    <section className="bg-slate-50 py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">Share your experience</p>
             <h2 className="mt-2 text-2xl font-bold text-slate-900">Write a review</h2>

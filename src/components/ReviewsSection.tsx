@@ -52,7 +52,7 @@ export function ReviewsSection({ title = "What our clients say", subtitle = "Tru
   if (!activeReview) return null;
 
   return (
-    <section className="bg-slate-50/70 py-16">
+    <section className="bg-slate-50/70 py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">{subtitle}</p>
@@ -60,7 +60,7 @@ export function ReviewsSection({ title = "What our clients say", subtitle = "Tru
         </div>
 
         <div
-          className="mt-10 overflow-hidden rounded-[28px] border border-emerald-100 bg-white/90 p-4 shadow-[0_20px_60px_-24px_rgba(16,24,40,0.2)] sm:p-6 lg:p-8"
+          className="mt-8 overflow-hidden rounded-[28px] border border-emerald-100 bg-white/90 p-4 shadow-[0_20px_60px_-24px_rgba(16,24,40,0.2)] sm:p-6 lg:p-8"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
