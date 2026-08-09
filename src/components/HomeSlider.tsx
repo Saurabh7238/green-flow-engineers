@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { SliderItem } from "@/lib/slider";
+import { SliderLoader } from "./SliderLoader";
 
 export function HomeSlider() {
   const [slides, setSlides] = useState<SliderItem[]>([]);
@@ -32,8 +33,8 @@ export function HomeSlider() {
 
   if (loading) {
     return (
-      <div className="aspect-[3/2] w-full bg-slate-200 animate-pulse flex items-center justify-center">
-        <p className="text-slate-600">Loading slider...</p>
+      <div className="aspect-[3/2] w-full overflow-hidden rounded-lg">
+        <SliderLoader />
       </div>
     );
   }

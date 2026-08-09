@@ -119,6 +119,146 @@ body::before {
   line-height: 1.75;
 }
 
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    text-shadow: 
+      0 0 10px rgba(16, 185, 129, 0.3),
+      0 0 20px rgba(2, 132, 199, 0.2);
+  }
+  50% {
+    opacity: 1;
+    text-shadow: 
+      0 0 20px rgba(16, 185, 129, 0.8),
+      0 0 40px rgba(2, 132, 199, 0.6),
+      0 0 60px rgba(16, 185, 129, 0.4);
+  }
+}
+
+/* Loader Animations */
+@keyframes loader-spin-fast {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-spin-slow {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes loader-pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes loader-slide {
+  0%, 100% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes bar-wave {
+  0%, 100% {
+    height: 0.75rem;
+  }
+  50% {
+    height: 2rem;
+  }
+}
+
+@keyframes fade-in-blink {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left-fill {
+  0% {
+    width: 0%;
+    opacity: 0;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes blink-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.loader-ring-outer {
+  animation: loader-spin-fast 2s linear infinite;
+}
+
+.loader-ring-middle {
+  animation: loader-spin-slow 3s linear infinite;
+}
+
+.loader-ring-inner {
+  animation: loader-spin-fast 1.5s linear infinite;
+}
+
+.loader-pulse {
+  animation: loader-pulse-glow 2s ease-in-out infinite;
+}
+
+.loader-bar {
+  animation: bar-wave 1.5s ease-in-out infinite;
+}
+
+.animate-fade {
+  animation: fade-in-blink 0.6s ease-in-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left-fill 2s ease-out forwards;
+}
+
+.animate-blink {
+  animation: blink-pulse 1.2s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-ring-outer,
+  .loader-ring-middle,
+  .loader-ring-inner,
+  .loader-pulse,
+  .loader-bar,
+  .animate-fade,
+  .animate-slide-in-left,
+  .animate-blink,
+  .animate-glow-pulse {
+    animation: none;
+  }
+}
+
 .prose-content strong {
   font-weight: 600;
   color: var(--blue-dark);
