@@ -16,8 +16,8 @@ export async function Footer() {
 
   return (
     <footer className="mt-auto border-t border-slate-200 bg-slate-900 pb-20 text-slate-300 sm:pb-20">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-7 sm:gap-8 sm:px-6 sm:py-10 lg:grid-cols-3">
-        <div className="col-span-2 space-y-3 sm:space-y-4 lg:col-span-1">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 py-7 sm:grid-cols-2 sm:gap-8 sm:px-6 sm:py-10 lg:grid-cols-3">
+        <div className="col-span-1 min-w-0 space-y-3 sm:space-y-4 lg:col-span-1">
           <div className="[&_span]:text-white [&_.text-brand-green-dark]:text-emerald-400">
             <Logo locale={locale} size="sm" />
           </div>
@@ -38,29 +38,29 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="space-y-3 sm:space-y-4">
+        <div className="min-w-0 space-y-3 sm:space-y-4">
           <h3 className="text-sm font-semibold uppercase tracking-wider text-white">{t("contactInfo")}</h3>
           <ul className="space-y-1.5 text-sm text-slate-300 sm:space-y-2">
             <li>
-              <a href={siteConfig.phoneHref} className="hover:text-emerald-400">
+              <a href={siteConfig.phoneHref} className="hover:text-emerald-400 break-words">
                 {siteConfig.phone}
               </a>
             </li>
             <li>
-              <a href={siteConfig.emailHref} className="hover:text-emerald-400">
+              <a href={siteConfig.emailHref} className="hover:text-emerald-400 break-words">
                 {siteConfig.email}
               </a>
             </li>
-            <li className="text-slate-400">{address}</li>
+            <li className="text-slate-400 break-words">{address}</li>
           </ul>
         </div>
 
-        <div className="space-y-3 sm:space-y-4">
+        <div className="min-w-0 space-y-3 sm:space-y-4">
           <h3 className="text-sm font-semibold uppercase tracking-wider text-white">{tNav("services")}</h3>
           <ul className="space-y-1.5 text-sm text-slate-300 sm:space-y-2">
             {serviceKeys.slice(0, 5).map((key) => (
               <li key={key}>
-                <Link href={`/${locale}/services/${key}`} className="hover:text-emerald-400 transition">
+                <Link href={`/${locale}/services/${key}`} className="hover:text-emerald-400 transition break-words">
                   {tServices(`${key}.title`)}
                 </Link>
               </li>
