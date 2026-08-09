@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { ServiceKey } from "@/data/services";
 import { serviceBackgroundImages, serviceIcons } from "@/data/services";
 import Link from "next/link";
@@ -15,15 +16,42 @@ export function ServiceCard({ serviceKey, compact = false }: ServiceCardProps) {
   const locale = useLocale();
   const href = `/${locale}/services/${serviceKey}`;
   const hasBackgroundImage = compact;
+  const cardRef = useRef<HTMLElement | null>(null);
+  const [isCentered, setIsCentered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = cardRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.intersectionRatio >= 0.1) {
+            setIsVisible(true);
+          }
+          setIsCentered(entry.intersectionRatio >= 0.25);
+        });
+      },
+      {
+        threshold: [0.15, 0.25, 0.5, 0.75],
+        rootMargin: "-30% 0px -30% 0px",
+      }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <Link href={href} className="group block h-full">
       <article
-        className={`relative isolate overflow-hidden rounded-2xl border p-6 shadow-sm transition ${
+        ref={cardRef}
+        className={`relative isolate overflow-hidden rounded-2xl border p-6 transition-all duration-500 ease-out will-change-transform ${
           hasBackgroundImage
-            ? "border-transparent bg-slate-900 bg-cover bg-center text-white hover:-translate-y-1 hover:shadow-lg"
-            : "border-slate-200 bg-white hover:border-brand-green/40 hover:shadow-md"
-        } ${compact ? "" : "h-full"}`}
+            ? "border-transparent bg-slate-900 bg-cover bg-center text-white"
+            : "border-slate-200 bg-white"
+        } ${compact ? "" : "h-full"} ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"} ${isCentered ? "scale-[1.03] shadow-xl ring-1 ring-brand-green/20" : "shadow-sm"}`}
         style={
           hasBackgroundImage
             ? { backgroundImage: `url(${serviceBackgroundImages[serviceKey]})` }

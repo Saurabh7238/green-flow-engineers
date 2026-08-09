@@ -11,21 +11,39 @@ export function StatsBar() {
     { icon: "⏰", value: "24x7", label: "Customer Support" },
   ];
   const targets = [50, 100, 8, 35, 24];
-  const [counts, setCounts] = useState(() => targets.map(() => 0));
+  const [counts, setCounts] = useState(() => targets.map(() => 1));
 
   useEffect(() => {
-    const duration = 900;
-    const startedAt = performance.now();
+    const duration = 3000;
     let frameId = 0;
+    let restartTimeout: number | undefined;
 
-    const animate = (now: number) => {
-      const progress = Math.min((now - startedAt) / duration, 1);
-      setCounts(targets.map((target) => Math.max(1, Math.floor(target * progress))));
-      if (progress < 1) frameId = window.requestAnimationFrame(animate);
+    const startAnimation = () => {
+      const startedAt = performance.now();
+      setCounts(targets.map(() => 1));
+
+      const animate = (now: number) => {
+        const progress = Math.min((now - startedAt) / duration, 1);
+        setCounts(targets.map((target) => Math.max(1, Math.floor(target * progress))));
+
+        if (progress < 1) {
+          frameId = window.requestAnimationFrame(animate);
+        } else {
+          restartTimeout = window.setTimeout(startAnimation, 7000);
+        }
+      };
+
+      frameId = window.requestAnimationFrame(animate);
     };
 
-    frameId = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frameId);
+    startAnimation();
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      if (restartTimeout !== undefined) {
+        window.clearTimeout(restartTimeout);
+      }
+    };
   }, []);
 
   return (
