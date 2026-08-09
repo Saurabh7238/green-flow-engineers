@@ -31,11 +31,11 @@ export function StatsBar() {
   return (
     <section className="py-0">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-5 items-center gap-1 text-center sm:gap-4 md:gap-4">
+        <div className="grid grid-cols-5 items-center gap-0 text-center sm:gap-2 md:gap-2">
           {items.map((it, index) => (
-            <div key={it.label} className="flex min-w-0 flex-col items-center gap-1 rounded-lg p-1 text-center sm:gap-2 sm:p-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-base sm:h-12 sm:w-12 sm:text-2xl">{it.icon}</div>
-              <div className="text-sm font-bold text-slate-900 sm:mt-1 sm:text-lg">{it.value.replace(/^\d+/, String(counts[index]))}</div>
+            <div key={it.label} className="flex min-w-0 flex-col items-center gap-0 rounded-lg p-0 text-center sm:gap-1 sm:p-1">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-sm sm:h-10 sm:w-10 sm:text-xl">{it.icon}</div>
+              <div className="text-sm font-bold text-slate-900 sm:mt-0.5 sm:text-base">{it.value.replace(/^\d+/, String(counts[index]))}</div>
               <div className="text-[9px] font-medium leading-tight text-slate-600 sm:text-xs">{it.label}</div>
             </div>
           ))}
