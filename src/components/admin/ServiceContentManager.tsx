@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { serviceKeys, type ServiceKey } from "@/data/services";
 import { getSlotVariant } from "@/lib/content-slot";
-import { GalleryManager } from "@/components/GalleryManager";
 
 type ServiceContentItem = {
   id: string;
@@ -357,8 +356,6 @@ export function ServiceContentManager() {
           <AddItemForm onAdd={handleAddItem} loading={loading} subtype={subtype} />
         </div>
       </div>
-
-      <GalleryManager />
 
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h3 className="text-xl font-semibold">Existing content</h3>

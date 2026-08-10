@@ -5,8 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
 const adminPages = [
-  { href: "/admin/all", label: "All managers" },
   { href: "/admin/content-manager", label: "Service content manager" },
+  { href: "/admin/gallery", label: "Gallery manager" },
   { href: "/admin/notifications", label: "Popup notification manager" },
   { href: "/admin/slider", label: "Homepage slider manager" },
   { href: "/admin/reviews", label: "Reviews manager" },
