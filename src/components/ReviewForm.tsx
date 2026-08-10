@@ -14,7 +14,7 @@ const currentUserStorageKey = "greenflow-current-user";
 export function ReviewForm() {
   const locale = useLocale();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [rating, setRating] = useState(5);
+  const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   
   const [loading, setLoading] = useState(false);
@@ -39,6 +39,12 @@ export function ReviewForm() {
     }
     setLoading(true);
     setStatus("");
+
+    if (rating < 1) {
+      setStatus("Please select a rating before submitting your review.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/reviews", {
@@ -82,17 +88,22 @@ export function ReviewForm() {
             <div className="space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700">Rating</label>
-                <select
-                  value={rating}
-                  onChange={(event) => setRating(Number(event.target.value))}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2"
-                >
-                  {[5, 4, 3, 2, 1].map((value) => (
-                    <option key={value} value={value}>
-                      {value} star{value === 1 ? "" : "s"}
-                    </option>
+                <div className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setRating(value)}
+                      className={`text-2xl leading-none transition ${
+                        value <= rating ? "text-amber-400 hover:text-amber-500" : "text-slate-300 hover:text-slate-400"
+                      }`}
+                      aria-label={`${value} star${value === 1 ? "" : "s"}`}
+                    >
+                      ★
+                    </button>
                   ))}
-                </select>
+                  <span className="ml-auto text-sm font-medium text-slate-600">{rating} / 5</span>
+                </div>
               </div>
 
               <div>
