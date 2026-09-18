@@ -1,31 +1,17 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { GalleryPreview } from "@/components/GalleryPreview";
 import { ServiceCard } from "@/components/ServiceCard";
 import { HomeSlider } from "@/components/HomeSlider";
-import { StatsBar } from "@/components/StatsBar";
-import { ReviewsSection } from "@/components/ReviewsSection";
-import { ReviewForm } from "@/components/ReviewForm";
 import { serviceKeys } from "@/data/services";
 import { blogPosts } from "@/data/blog";
+import { galleryItems } from "@/data/gallery";
+import { siteConfig } from "@/lib/site";
 import { siteUrl } from "@/lib/site-url";
 
 type Props = { params: Promise<{ locale: string }> };
-
-const coreValueHighlightClasses = [
-  "text-emerald-950",
-  "text-sky-950",
-  "text-amber-950",
-  "text-rose-950",
-];
-
-const coreValueHighlights = [
-  "End-to-end supply, installation & commissioning",
-  "Eco-conscious designs for long-term savings",
-  "Responsive maintenance and after-sales support",
-  "Industry-standard safety and quality practices",
-];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -72,94 +58,66 @@ export default async function HomePage({ params }: Props) {
   const tCta = await getTranslations("cta");
   const tNav = await getTranslations("nav");
   const tCat = await getTranslations("categories");
-  const tAbout = await getTranslations("about");
   const loc = locale as "en" | "hi";
 
   const featuredPosts = blogPosts.slice(0, 3);
+  const featuredProjects = galleryItems.filter((item) => item.type === "project").slice(0, 3);
+  const processSteps = ["Consultation", "Site assessment", "Engineering & design", "Supply & installation", "Testing & commissioning", "After-sales support"];
 
   return (
     <>
       <HomeSlider />
 
-      <section className="bg-slate-100/80 py-8">
+      <section className="border-y border-[#dce6df] bg-[#f5f7f4] py-7">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <StatsBar />
-        </div>
-      </section>
-
-      <section className="border-b border-emerald-100 bg-gradient-to-b from-emerald-50/70 to-white py-8">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mx-auto max-w-4xl text-center">
-            <p className="text-base font-bold uppercase tracking-[0.18em] text-brand-green sm:text-2xl logo-shine">Green Flow Engineers</p>
-            <h1 className="mt-3 text-1xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              Engineering Progress. Inspiring Sustainability.
-            </h1>
-            <p className="mt-4 text-sm font-semibold text-slate-600">Established in 2025 | Kanpur, Uttar Pradesh</p>
-            <p className="mt-6 text-base leading-relaxed text-slate-700">
-              Green Flow Engineers is a trusted engineering solutions provider based in Kanpur, Uttar Pradesh. Since 2025,
-              we have been delivering advanced, sustainable, and reliable systems for industrial and commercial sectors across India.
-            </p>
-            <p className="mt-4 text-base leading-relaxed text-slate-700">
-              Driven by innovation, quality, and environmental responsibility, we focus on precision engineering, timely project
-              execution, and long-term customer satisfaction. Our goal is to build infrastructure that improves efficiency, reduces
-              environmental impact, and meets global quality standards.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-slate-100/80 pb-16 pt-4 sm:pt-6">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-            <h2 className="text-2xl font-bold text-slate-900">{t("servicesOverview")}</h2>
-            <Link
-              href={`/${locale}/services`}
-              className="text-sm font-semibold text-brand-blue hover:text-brand-blue-dark"
-            >
-              {tCta("viewAllServices")} →
-            </Link>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {serviceKeys.map((key) => (
-              <ServiceCard key={key} serviceKey={key} compact />
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {["Engineering solutions", "Project support", "Quality-focused execution", "Sustainable systems"].map((item, index) => (
+              <div key={item} className="flex items-center gap-3 border-l-2 border-brand-green px-4 py-2">
+                <span className="font-mono text-xs font-bold text-brand-green">0{index + 1}</span>
+                <span className="text-sm font-semibold uppercase tracking-[0.08em] text-slate-700">{item}</span>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-4 pt-16 sm:px-6">
-        <h2 className="text-2xl font-bold text-slate-900">{t("whyUsTitle")}</h2>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {(["experience", "sustainability", "support", "compliance"] as const).map(
-            (key) => (
-              <li
-                key={key}
-                className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-5 text-sm font-medium text-slate-700"
-              >
-                <span className="mb-2 block text-2xl text-brand-green">✓</span>
-                {t(`whyUs.${key}`)}
-              </li>
-            ),
-          )}
-        </ul>
+      <section className="section-pad bg-white">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+          <div>
+            <p className="eyebrow">Engineering with purpose</p>
+            <h2 className="section-title">Built for the way industry moves.</h2>
+          </div>
+          <div>
+            <p className="text-lg leading-8 text-slate-600">{t("introText")}</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href={`/${locale}/about`} className="button button-dark">{tCta("learnMore")} <span aria-hidden="true">↗</span></Link>
+              <a href={siteConfig.phoneHref} className="button button-outline">Talk to an engineer</a>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="bg-slate-100/80 pb-4 pt-4">
+      <section className="section-pad bg-[#f5f7f4]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <h2 className="text-2xl font-bold text-slate-900">{tAbout("coreValuesTitle")}</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="flex items-start gap-3 rounded-2xl p-4 font-medium text-emerald-950 shadow-sm">
-              <span className="mt-0.5 text-lg text-brand-green" aria-hidden>{"\u2713"}</span>
-              <span>{coreValueHighlights[0]}</span>
-            </div>
-            <div className="space-y-3">
-              {coreValueHighlights.slice(1).map((value, index) => (
-                <div
-                  key={value}
-                  className={`flex items-start gap-3 rounded-xl p-4 font-medium shadow-sm ${coreValueHighlightClasses[index + 1]}`}
-                >
-                  <span className="mt-0.5 text-lg text-brand-green" aria-hidden>✓</span>
-                  <span>{value}</span>
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-5">
+            <div><p className="eyebrow">Capabilities</p><h2 className="section-title">What we deliver</h2></div>
+            <Link href={`/${locale}/services`} className="arrow-link">{tCta("viewAllServices")} <span aria-hidden="true">↗</span></Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {serviceKeys.map((key) => <ServiceCard key={key} serviceKey={key} compact />)}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-pad bg-[#14241f] text-white">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]">
+            <div><p className="eyebrow text-emerald-300">How we work</p><h2 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">From brief to working system.</h2></div>
+            <div className="grid gap-0 sm:grid-cols-2">
+              {processSteps.map((step, index) => (
+                <div key={step} className="process-step border-t border-white/15 py-5 sm:pr-8">
+                  <span className="font-mono text-xs text-emerald-300">0{index + 1}</span>
+                  <h3 className="mt-2 text-lg font-semibold">{step}</h3>
                 </div>
               ))}
             </div>
@@ -167,37 +125,26 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
-      
+      <GalleryPreview locale={locale} />
 
-      <section className="bg-white pb-8 pt-2">
+      <section className="section-pad bg-white">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mb-8 text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-green">Our Clients</p>
-            <h2 className="mt-3 text-2xl font-bold text-slate-900">Trusted by leading brands</h2>
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-5">
+            <div><p className="eyebrow">Selected work</p><h2 className="section-title">Projects in motion</h2></div>
+            <Link href={`/${locale}/gallery`} className="arrow-link">View project gallery <span aria-hidden="true">↗</span></Link>
           </div>
-          <div className="marquee overflow-hidden pb-0">
-            <div className="marquee__track inline-flex items-center gap-4">
-              {(() => {
-                const clients = [
-                  { name: 'Sagar Group', logo: '/images/clients/Sagar.png' },
-                  { name: 'Bhilosa', logo: '/images/clients/Bhilosa.png' },
-                  { name: 'Trident', logo: '/images/clients/Trident.png' },
-                  { name: 'Reliance', logo: '/images/clients/Reliance.png' },
-                ];
-                return [...clients, ...clients].map((client, idx) => (
-                  <div key={`${client.name}-${idx}`} className="client-logo-container">
-                    <img src={client.logo} alt={client.name} className="client-logo" />
-                  </div>
-                ));
-              })()}
-            </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {featuredProjects.map((project) => (
+              <Link href={`/${locale}/gallery`} key={project.id} className="project-tile group">
+                <Image src={project.image} alt={project.title[loc]} fill sizes="(max-width: 768px) 100vw, 33vw" />
+                <div className="project-tile__caption"><span className="eyebrow text-emerald-300">{project.serviceKey}</span><h3>{project.title[loc]}</h3></div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      <GalleryPreview locale={locale} />
-
-      <section className="border-t border-slate-200 bg-white py-10">
+      <section className="section-pad bg-[#f5f7f4]">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <h2 className="text-2xl font-bold text-slate-900">{tNav("blog")}</h2>
@@ -212,7 +159,7 @@ export default async function HomePage({ params }: Props) {
             {featuredPosts.map((post) => (
               <article
                 key={post.slug}
-                className="rounded-2xl border border-slate-200 p-5 shadow-sm"
+                className="border-t border-slate-300 py-5"
               >
                 <span className="text-xs font-semibold uppercase text-brand-blue">
                   {tCat(post.category)}
@@ -234,8 +181,12 @@ export default async function HomePage({ params }: Props) {
         </div>
       </section>
 
-      <ReviewsSection title={t("quotesTitle")} subtitle={t("quotesSubtitle")} />
-      <ReviewForm />
+      <section className="section-pad bg-brand-green text-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-7 px-4 sm:px-6 md:flex-row md:items-end md:justify-between">
+          <div><p className="eyebrow text-emerald-100">Start a conversation</p><h2 className="mt-3 max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">Have a system to plan?</h2></div>
+          <Link href={`/${locale}/enquiry`} className="button button-light">Request a quote <span aria-hidden="true">↗</span></Link>
+        </div>
+      </section>
     </>
   );
 }

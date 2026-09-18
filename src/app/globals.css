@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --green-primary: #059669;
-  --green-dark: #047857;
-  --blue-primary: #0284c7;
-  --blue-dark: #0369a1;
+  --background: #f5f7f4;
+  --foreground: #18231f;
+  --green-primary: #1e6b4b;
+  --green-dark: #14513a;
+  --blue-primary: #355c61;
+  --blue-dark: #244347;
 }
 
 @theme inline {
@@ -23,31 +23,6 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  z-index: -1;
-  inset: -20%;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 12% 18%, rgb(5 150 105 / 12%), transparent 26rem),
-    radial-gradient(circle at 88% 14%, rgb(2 132 199 / 10%), transparent 24rem),
-    radial-gradient(circle at 48% 88%, rgb(5 150 105 / 8%), transparent 30rem);
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
-  animation: ambient-background 9s ease-in-out infinite alternate;
-}
-
-@keyframes ambient-background {
-  from {
-    transform: translate3d(-3%, -2%, 0) scale(1.02);
-  }
-
-  to {
-    transform: translate3d(3%, 2%, 0) scale(1.06);
-  }
 }
 
 @keyframes marquee-right-to-left {
@@ -76,9 +51,33 @@ body::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before {
-    animation: none;
-  }
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
+
+.section-pad { padding-block: clamp(4.5rem, 9vw, 8rem); }
+.eyebrow { color: var(--green-primary); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.18em; line-height: 1.4; text-transform: uppercase; }
+.section-title { margin-top: 0.75rem; max-width: 38rem; color: #18231f; font-size: clamp(2.2rem, 4vw, 4rem); font-weight: 750; letter-spacing: -0.04em; line-height: 1.04; }
+.button { display: inline-flex; min-height: 2.9rem; align-items: center; justify-content: center; gap: 0.75rem; padding: 0.75rem 1.15rem; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; transition: transform 180ms ease, background-color 180ms ease, color 180ms ease; }
+.button:hover { transform: translateY(-2px); }
+.button-dark { background: #18231f; color: white; }
+.button-dark:hover { background: var(--green-dark); }
+.button-light { background: white; color: #18231f; }
+.button-outline { border: 1px solid #c7d3cc; color: #18231f; }
+.button-outline:hover { border-color: var(--green-primary); color: var(--green-primary); }
+.arrow-link { display: inline-flex; align-items: center; gap: 0.65rem; color: var(--green-primary); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.arrow-link span { transition: transform 180ms ease; }
+.arrow-link:hover span { transform: translate(3px, -3px); }
+.project-tile { position: relative; display: block; aspect-ratio: 1 / 1.08; overflow: hidden; background: #18231f; }
+.project-tile img { object-fit: cover; transition: transform 500ms ease; }
+.project-tile::after { content: ""; position: absolute; inset: 35% 0 0; background: linear-gradient(transparent, rgb(11 25 20 / 90%)); }
+.project-tile:hover img { transform: scale(1.05); }
+.project-tile__caption { position: absolute; z-index: 1; inset-inline: 1.25rem; bottom: 1.25rem; color: white; }
+.project-tile__caption h3 { margin-top: 0.45rem; font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+.process-step { position: relative; }
+
+@media (max-width: 767px) {
+  .section-title { font-size: 2.55rem; }
+  .project-tile { aspect-ratio: 1.35 / 1; }
 }
 
 @media print {
