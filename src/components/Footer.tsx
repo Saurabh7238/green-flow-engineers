@@ -47,6 +47,11 @@ export async function Footer() {
               </a>
             </li>
             <li>
+              <a href={siteConfig.secondaryPhoneHref} className="hover:text-emerald-400 break-words">
+                {siteConfig.secondaryPhone}
+              </a>
+            </li>
+            <li>
               <a href={siteConfig.emailHref} className="hover:text-emerald-400 break-words">
                 {siteConfig.email}
               </a>

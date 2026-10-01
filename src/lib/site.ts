@@ -1,6 +1,8 @@
 export const siteConfig = {
   phone: "+91 9628434151",
   phoneHref: "tel:+919628434151",
+  secondaryPhone: "+91 9662434151",
+  secondaryPhoneHref: "tel:+919662434151",
   email: "greenflowengineers@gmail.com",
   emailHref: "mailto:greenflowengineers@gmail.com",
   address: {

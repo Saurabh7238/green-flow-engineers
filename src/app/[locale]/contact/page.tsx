@@ -34,6 +34,12 @@ export default async function ContactPage({ params }: Props) {
             >
               {dbContent.phone || siteConfig.phone}
             </a>
+            <a
+              href={siteConfig.secondaryPhoneHref}
+              className="mt-1 block text-lg font-semibold text-brand-green-dark hover:underline"
+            >
+              {siteConfig.secondaryPhone}
+            </a>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-sm font-semibold uppercase text-slate-500">{t("email")}</h2>
